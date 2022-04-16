@@ -1,0 +1,14 @@
+{
+	"en": {
+		"INTERACTABLE_SHRINE_REPAIR_NAME": "Shrine of Repair",
+		"INTERACTABLE_SHRINE_REPAIR_CONTEXT": "Repair items?",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">You repaired items.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\"{0} repaired items.</style>"
+	},
+	"RU": {
+		"INTERACTABLE_SHRINE_REPAIR_NAME": "Святилище Починки",
+		"INTERACTABLE_SHRINE_REPAIR_CONTEXT": "Починить предметы?",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">Вы починили предметы.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\">{0} починил предметы.</style>"
+	}
+}
