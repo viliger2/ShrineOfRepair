@@ -3,7 +3,7 @@
 
 Risk of Rain 2 mod, adds a shrine to repair broken items. Features custom price scaling, to account for number of broken items you **might** have in your inventory, so the shrine is cheaper than a single chest early on and gets sharper price increase in the late game compared to the rest of interactables. Everything is customizable (base price, director costs and weights, which formula to use, etc.)
 Custom scaling formula is
-![alt text](https://github.com/viliger2/ShrineOfRepair/blob/main/images/formula.png)  
+![diffCoef^customsScalingModifier * BaseCost](https://github.com/viliger2/ShrineOfRepair/blob/main/images/formula.png)  
 where
 * diffCoef - difficulty coefficient, scales with time
 * customScalingModifier - custom modifier, used to make chest cheaper at the start and more expensive in late game
