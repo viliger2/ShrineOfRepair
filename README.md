@@ -21,4 +21,5 @@ good model, texturing - Extrabee
 * maybe make a version that accounts to which items you repair, so I don't have to use custom formulas and hack game design solutions
 
 ## Version history
+* 1.0.1 Reupload because r2modman is a good program
 * 1.0.0 Initial release
