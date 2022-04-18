@@ -26,6 +26,30 @@ namespace ShrineOfRepair.Modules.Interactables
         public static ConfigEntry<int> DirectorWeight;
         public static ConfigEntry<DirectorAPI.InteractableCategory> DirectorCategory;
         public static ConfigEntry<bool> UseBadModel;
+        public static ConfigEntry<string> Blacklist;
+
+        public static Dictionary<ItemIndex, ItemIndex> FillRepairItemsDictionary()
+        {
+            Dictionary<ItemIndex, ItemIndex> dictionary = new Dictionary<ItemIndex, ItemIndex>();
+
+            dictionary.Add(DLC1Content.Items.FragileDamageBonusConsumed.itemIndex, DLC1Content.Items.FragileDamageBonus.itemIndex); // watch
+            dictionary.Add(DLC1Content.Items.HealingPotionConsumed.itemIndex, DLC1Content.Items.HealingPotion.itemIndex); // potion
+            dictionary.Add(RoR2Content.Items.ExtraLifeConsumed.itemIndex, RoR2Content.Items.ExtraLife.itemIndex); // dio
+            dictionary.Add(DLC1Content.Items.ExtraLifeVoidConsumed.itemIndex, DLC1Content.Items.ExtraLifeVoid.itemIndex); // larva
+
+            // ItemIndex enums are index numbers from "Item & Equipment IDs and Names" page
+            var itemIds = Blacklist.Value.Split(',');
+            foreach (var itemId in itemIds)
+            {
+                ItemIndex itemIndex;
+                if(System.Enum.TryParse(itemId.Trim(), out itemIndex))
+                {
+                    dictionary.Remove(itemIndex);
+                }
+            }
+
+            return dictionary;
+        }
 
         public override void Init(ConfigFile config)
         {
@@ -46,6 +70,7 @@ namespace ShrineOfRepair.Modules.Interactables
             DirectorCost        = config.Bind("Director", "Director Cost", 20, "Cost of the shrine in director credits. By defeult equal to the cost of most shrines.");
             DirectorWeight      = config.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
             DirectorCategory    = config.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
+            Blacklist           = config.Bind("Blacklist", "Blacklist", "", "Blacklist for items. Adding an item to the list will make them unrepairable. List should consists of item ids separated by commas and everything else will be (hopefully) ignored. IDs for Hoopo items:\nDelicate Watch (Broken) - 68, Empty Bottle - 81, Dio's Best Friend (Consumed) - 57, Pluripotent Larva (Consumed) - 59");
         }
 
         public void CreateInteractable()
@@ -148,7 +173,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     {
                         bool isShrineAvailable = false;
 
-                        var dictionary = RepairShrineManager.FillRepairItemsDictionary();
+                        var dictionary = FillRepairItemsDictionary();
                         foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in dictionary)
                         {
                             if (body.inventory.GetItemCount(pairedItems.Key) > 0)
@@ -189,19 +214,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 : (int)(Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, ScalingModifier) * PurchaseInteraction.cost);
 
             PurchaseInteraction.cost = BaseCostDetermination;
-            RepairItemsDictionary = FillRepairItemsDictionary();
-        }
-
-        public static Dictionary<ItemIndex, ItemIndex> FillRepairItemsDictionary()
-        {
-            Dictionary<ItemIndex, ItemIndex> dictionary = new Dictionary<ItemIndex, ItemIndex>();
-
-            dictionary.Add(DLC1Content.Items.FragileDamageBonusConsumed.itemIndex, DLC1Content.Items.FragileDamageBonus.itemIndex); // watch
-            dictionary.Add(DLC1Content.Items.HealingPotionConsumed.itemIndex, DLC1Content.Items.HealingPotion.itemIndex); // potion
-            dictionary.Add(RoR2Content.Items.ExtraLifeConsumed.itemIndex, RoR2Content.Items.ExtraLife.itemIndex); // dio
-            dictionary.Add(DLC1Content.Items.ExtraLifeVoidConsumed.itemIndex, DLC1Content.Items.ExtraLifeVoid.itemIndex); // larva
-
-            return dictionary;
+            RepairItemsDictionary = ShrineOfRepair.FillRepairItemsDictionary();
         }
 
         public void RepairPurchaseAttempt(Interactor interactor)
