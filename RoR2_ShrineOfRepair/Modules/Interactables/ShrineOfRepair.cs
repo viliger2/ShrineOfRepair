@@ -18,15 +18,30 @@ namespace ShrineOfRepair.Modules.Interactables
             ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab")
             : MainBundle.LoadAsset<GameObject>("ShrineRepairGood.prefab");
 
+        public enum CostTypes
+        {
+            Gold,
+            VoidCoin,
+            LunarCoin
+        }
 
-        public static ConfigEntry<int> BaseCost;
-        public static ConfigEntry<bool> UseDefaultScaling;
-        public static ConfigEntry<float> ScalingModifier;
         public static ConfigEntry<int> DirectorCost;
         public static ConfigEntry<int> DirectorWeight;
         public static ConfigEntry<DirectorAPI.InteractableCategory> DirectorCategory;
+
         public static ConfigEntry<bool> UseBadModel;
+
         public static ConfigEntry<string> Blacklist;
+
+        public static ConfigEntry<CostTypes> CurrencyType;
+
+        public static ConfigEntry<int> LunarCoinCost;
+
+        public static ConfigEntry<int> VoidCoinCost;
+
+        public static ConfigEntry<int> GoldBaseCost;
+        public static ConfigEntry<bool> GoldUseDefaultScaling;
+        public static ConfigEntry<float> GoldScalingModifier;
 
         public static Dictionary<ItemIndex, ItemIndex> FillRepairItemsDictionary()
         {
@@ -42,7 +57,7 @@ namespace ShrineOfRepair.Modules.Interactables
             foreach (var itemId in itemIds)
             {
                 ItemIndex itemIndex;
-                if(System.Enum.TryParse(itemId.Trim(), out itemIndex))
+                if (System.Enum.TryParse(itemId.Trim(), out itemIndex))
                 {
                     dictionary.Remove(itemIndex);
                 }
@@ -63,14 +78,23 @@ namespace ShrineOfRepair.Modules.Interactables
 
         private void InitConfig(ConfigFile config)
         {
-            UseBadModel         = config.Bind("Model", "Use Shitty Model", false, "Use shitty model that I made myself. If you want to see what bad modeling by bad programmer looks like - be my guest. I made it, so might as well put it here.");
-            BaseCost            = config.Bind("Scaling", "Shrine Base Cost", 12, "Base cost of the interactable that is used for scaling. Will spawn with this cost at the start of the run.");
-            UseDefaultScaling   = config.Bind("Scaling", "Use Default Scaling", false, "Use default scaling formula instead of custom scaling formula for the shrine. Custom formula is diffCoef^customsScalingModifier * BaseCost, default formula is diffCoef^1.25 * BaseCost * ScalingModifier");
-            ScalingModifier     = config.Bind("Scaling", "Scaling Modifier", 1.35f, "Used for defining how cost of shrine scales throughout the run for both default and custom scaling formulas.");
-            DirectorCost        = config.Bind("Director", "Director Cost", 20, "Cost of the shrine in director credits. By defeult equal to the cost of most shrines.");
-            DirectorWeight      = config.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
-            DirectorCategory    = config.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
-            Blacklist           = config.Bind("Blacklist", "Blacklist", "", "Blacklist for items. Adding an item to the list will make them unrepairable. List should consists of item ids separated by commas and everything else will be (hopefully) ignored. IDs for Hoopo items:\nDelicate Watch (Broken) - 68, Empty Bottle - 81, Dio's Best Friend (Consumed) - 57, Pluripotent Larva (Consumed) - 59");
+            UseBadModel = config.Bind("Model", "Use Shitty Model", false, "Use shitty model that I made myself. If you want to see what bad modeling by bad programmer looks like - be my guest. I made it, so might as well put it here.");
+
+            DirectorCost = config.Bind("Director", "Director Cost", 20, "Cost of the shrine in director credits. By defeult equal to the cost of most shrines.");
+            DirectorWeight = config.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
+            DirectorCategory = config.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
+
+            Blacklist = config.Bind("Blacklist", "Blacklist", "", "Blacklist for items. Adding an item to the list will make them unrepairable. List should consists of item ids separated by commas and everything else will be (hopefully) ignored. IDs for Hoopo items:\nDelicate Watch (Broken) - 68, Empty Bottle - 81, Dio's Best Friend (Consumed) - 57, Pluripotent Larva (Consumed) - 59");
+
+            CurrencyType = config.Bind("Currency", "Currency Type", CostTypes.Gold, "Type of currency used to purchase shrine. Using anything other than \"Gold\" disables price scaling over time. Each currency has its own options.");
+
+            LunarCoinCost = config.Bind("Lunar Coins", "Shrine Base Cost", 2, "Base cost of the interactable in lunar coins. Does not scale with time. Can be used with EphemeralCoins.");
+
+            VoidCoinCost = config.Bind("Void Coins", "Shrine Base Cost", 2, "Base cost of the interactable in void coins. Does not scale with time. To be used with ReleasedFromTheVoid.");
+
+            GoldBaseCost = config.Bind("Gold", "Shrine Base Cost", 12, "Base cost of the interactable in gold that is used for scaling. Will spawn with this cost at the start of the run.");
+            GoldUseDefaultScaling = config.Bind("Gold", "Use Default Scaling", false, "Use default scaling formula instead of custom scaling formula for the shrine. Custom formula is diffCoef^customsScalingModifier * BaseCost, default formula is diffCoef^1.25 * BaseCost * ScalingModifier");
+            GoldScalingModifier = config.Bind("Gold", "Scaling Modifier", 1.35f, "Used for defining how cost of shrine scales throughout the run for both default and custom scaling formulas.");
         }
 
         public void CreateInteractable()
@@ -81,9 +105,9 @@ namespace ShrineOfRepair.Modules.Interactables
             var purchaseInteraction = InteractableModel.AddComponent<PurchaseInteraction>();
             purchaseInteraction.displayNameToken = $"INTERACTABLE_{InteractableLangToken}_NAME";
             purchaseInteraction.contextToken = $"INTERACTABLE_{InteractableLangToken}_CONTEXT";
-            purchaseInteraction.costType = CostTypeIndex.Money;
-            purchaseInteraction.automaticallyScaleCostWithDifficulty = UseDefaultScaling.Value;
-            purchaseInteraction.cost = BaseCost.Value;
+            purchaseInteraction.costType = GetCostTypeFromConfig(CurrencyType.Value);
+            purchaseInteraction.automaticallyScaleCostWithDifficulty = CurrencyType.Value == CostTypes.Gold && GoldUseDefaultScaling.Value;
+            purchaseInteraction.cost = GetCostValueFromConfig(CurrencyType.Value);
             purchaseInteraction.available = true;
             purchaseInteraction.setUnavailableOnTeleporterActivated = false; // it controlls that it becomes completely unavailable, not that you can't interact with it if it is outside of teleporter range
             purchaseInteraction.isShrine = true;
@@ -91,7 +115,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
             // provides information and icon when you ping an object
             var pingInfoProvider = InteractableModel.AddComponent<PingInfoProvider>();
-            pingInfoProvider.pingIconOverride = MainBundle.LoadAsset<Sprite>("Assets/RoR2/Base/Common/MiscIcons/texShrineIconOutlined.png");        
+            pingInfoProvider.pingIconOverride = MainBundle.LoadAsset<Sprite>("Assets/RoR2/Base/Common/MiscIcons/texShrineIconOutlined.png");
 
             // provides a name
             var genericNameDisplay = InteractableModel.AddComponent<GenericDisplayNameProvider>();
@@ -100,8 +124,8 @@ namespace ShrineOfRepair.Modules.Interactables
             // provides an interaction with object
             var shrineManager = InteractableModel.AddComponent<RepairShrineManager>();
             shrineManager.PurchaseInteraction = purchaseInteraction;
-            shrineManager.ScalingModifier = ScalingModifier.Value;
-            shrineManager.UseDefaultScaling = UseDefaultScaling.Value;
+            shrineManager.ScalingModifier = GoldScalingModifier.Value;
+            shrineManager.UseDefaultScaling = GoldUseDefaultScaling.Value;
 
             // provides collision with object
             var entityLocator = InteractableModel.GetComponentInChildren<MeshCollider>().gameObject.AddComponent<EntityLocator>();
@@ -130,6 +154,34 @@ namespace ShrineOfRepair.Modules.Interactables
             var billboard = InteractableModel.transform.Find("Icon").gameObject.AddComponent<Billboard>();
 
             PrefabAPI.RegisterNetworkPrefab(InteractableModel);
+        }
+
+        private CostTypeIndex GetCostTypeFromConfig(CostTypes currency)
+        {
+            switch (currency)
+            {
+                case CostTypes.LunarCoin:
+                    return CostTypeIndex.LunarCoin;
+                case CostTypes.VoidCoin:
+                    return CostTypeIndex.VoidCoin;
+                default:
+                case CostTypes.Gold:
+                    return CostTypeIndex.Money;
+            }
+        }
+
+        private int GetCostValueFromConfig(CostTypes currency)
+        {
+            switch (currency)
+            {
+                case CostTypes.LunarCoin:
+                    return LunarCoinCost.Value;
+                case CostTypes.VoidCoin:
+                    return VoidCoinCost.Value;
+                default:
+                case CostTypes.Gold:
+                    return GoldBaseCost.Value;
+            }
         }
 
         public void CreateInteractableSpawnCard()
@@ -209,11 +261,21 @@ namespace ShrineOfRepair.Modules.Interactables
             }
 
             PurchaseInteraction.onPurchase.AddListener(RepairPurchaseAttempt);
-            BaseCostDetermination = UseDefaultScaling
-                ? (int)(PurchaseInteraction.cost * ScalingModifier)
-                : (int)(Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, ScalingModifier) * PurchaseInteraction.cost);
+            if (PurchaseInteraction.costType == CostTypeIndex.Money)
+            {
+                BaseCostDetermination = UseDefaultScaling
+                    ? (int)(PurchaseInteraction.cost * ScalingModifier)
+                    : (int)(Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, ScalingModifier) * PurchaseInteraction.cost);
 
-            PurchaseInteraction.cost = BaseCostDetermination;
+                PurchaseInteraction.cost = BaseCostDetermination;
+            }
+            else
+            {
+                // probably for networking, I dunno
+                BaseCostDetermination = PurchaseInteraction.cost;
+                PurchaseInteraction.cost = BaseCostDetermination;
+            }
+
             RepairItemsDictionary = ShrineOfRepair.FillRepairItemsDictionary();
         }
 

@@ -9,7 +9,7 @@ using RoR2;
 
 namespace ShrineOfRepair.Modules
 {
-	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.0.0")]
+	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.1.0")]
 	[BepInDependency(R2API.R2API.PluginGUID)]
 	[R2APISubmoduleDependency(nameof(LanguageAPI), nameof(PrefabAPI), nameof(NetworkingAPI), nameof(DirectorAPI))]
 
