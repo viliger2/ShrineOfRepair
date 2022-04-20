@@ -313,7 +313,6 @@ namespace ShrineOfRepair.Modules.Interactables
                     baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT"
                 });
 
-
                 if (NetworkServer.active)
                 {
                     PurchaseInteraction.SetAvailable(false);
