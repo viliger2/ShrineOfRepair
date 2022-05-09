@@ -151,7 +151,20 @@ namespace ShrineOfRepair.Modules.Interactables
             highlightController.highlightColor = Highlight.HighlightColor.interactive;
 
             // this is probably an icon on top of the shrine
-            var billboard = InteractableModel.transform.Find("Icon").gameObject.AddComponent<Billboard>();
+            var icon = InteractableModel.transform.Find("Icon");
+            var billboard = icon.gameObject.AddComponent<Billboard>();
+
+            // applying hopoo shader to the icon
+            Material material = LegacyResourcesAPI.Load<SpawnCard>("spawncards/interactablespawncard/iscShrineBoss").prefab.transform.Find("Symbol").GetComponent<MeshRenderer>().material;
+            SpriteRenderer component = icon.GetComponent<SpriteRenderer>();
+            Texture texture = component.material.mainTexture;
+
+            var color = component.color;
+
+            component.material = new Material(material.shader);
+            component.material.CopyPropertiesFromMaterial(material);
+            component.material.mainTexture = texture;
+            component.material.SetColor("_TintColor", color);
 
             PrefabAPI.RegisterNetworkPrefab(InteractableModel);
         }
