@@ -12,7 +12,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
         public InteractableBase()
         {
-            if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).FullName + "\" inhereting InteractableBase was instanced twise");
+            if (instance != null) throw new InvalidOperationException("Singleton class \"" + typeof(T).FullName + "\" inhereting InteractableBase was instanced twice");
             instance = this as T;
         }
     }
@@ -20,8 +20,6 @@ namespace ShrineOfRepair.Modules.Interactables
     public abstract class InteractableBase
     {
         public abstract string InteractableLangToken { get; }
-
-        public abstract GameObject InteractableModel { get; }
 
         public abstract void Init(ConfigFile config);
 

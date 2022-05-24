@@ -7,16 +7,13 @@ using RoR2.Hologram;
 using R2API;
 using System.Linq;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
+using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 
 namespace ShrineOfRepair.Modules.Interactables
 {
     public class ShrineOfRepair : InteractableBase<ShrineOfRepair>
     {
         public override string InteractableLangToken => "SHRINE_REPAIR";
-
-        public override GameObject InteractableModel => UseBadModel.Value
-            ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab")
-            : MainBundle.LoadAsset<GameObject>("ShrineRepairGood.prefab");
 
         public enum CostTypes
         {
@@ -71,9 +68,19 @@ namespace ShrineOfRepair.Modules.Interactables
             ShrineofRepairAssets.Init();
 
             InitConfig(config);
-            CreateInteractable();
-            CreateInteractableSpawnCard();
+            CreateInteractables();
             Hooks();
+        }
+
+        private void CreateInteractables()
+        {
+            var normalModel = CreateInteractable(UseBadModel.Value ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab") : MainBundle.LoadAsset<GameObject>("ShrineRepairGood.prefab"));
+            var sandyModel = CreateInteractable(UseBadModel.Value ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab") : MainBundle.LoadAsset<GameObject>("ShrineRepairGood_sandy.prefab"));
+            var snowyModel = CreateInteractable(UseBadModel.Value ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab") : MainBundle.LoadAsset<GameObject>("ShrineRepairGood_snowy.prefab"));
+
+            CreateInteractableSpawnCard(normalModel, "iscShrineRepair", GetNormalStageList());
+            CreateInteractableSpawnCard(sandyModel, "iscShrineRepairSandy", GetSandyStageList());
+            CreateInteractableSpawnCard(snowyModel, "iscShrineRepairSnowy", GetSnowyStageList());
         }
 
         private void InitConfig(ConfigFile config)
@@ -97,7 +104,7 @@ namespace ShrineOfRepair.Modules.Interactables
             GoldScalingModifier = config.Bind("Gold", "Scaling Modifier", 1.35f, "Used for defining how cost of shrine scales throughout the run for both default and custom scaling formulas.");
         }
 
-        public void CreateInteractable()
+        private GameObject CreateInteractable(GameObject InteractableModel)
         {
             InteractableModel.AddComponent<NetworkIdentity>();
 
@@ -167,6 +174,8 @@ namespace ShrineOfRepair.Modules.Interactables
             component.material.SetColor("_TintColor", color);
 
             PrefabAPI.RegisterNetworkPrefab(InteractableModel);
+
+            return InteractableModel;
         }
 
         private CostTypeIndex GetCostTypeFromConfig(CostTypes currency)
@@ -197,10 +206,58 @@ namespace ShrineOfRepair.Modules.Interactables
             }
         }
 
-        public void CreateInteractableSpawnCard()
+        private List<DirectorAPI.Stage> GetNormalStageList()
+        {
+            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
+
+            stageList.Add(DirectorAPI.Stage.DistantRoost);
+            stageList.Add(DirectorAPI.Stage.AbyssalDepths);
+            stageList.Add(DirectorAPI.Stage.TitanicPlains);
+            stageList.Add(DirectorAPI.Stage.SunderedGrove);
+            stageList.Add(DirectorAPI.Stage.SirensCall);
+            stageList.Add(DirectorAPI.Stage.SkyMeadow);
+            stageList.Add(DirectorAPI.Stage.SulfurPools);
+            stageList.Add(DirectorAPI.Stage.ScorchedAcres);
+            stageList.Add(DirectorAPI.Stage.AphelianSanctuary);
+
+            stageList.Add(DirectorAPI.Stage.AbyssalDepthsSimulacrum);
+            stageList.Add(DirectorAPI.Stage.TitanicPlainsSimulacrum);
+            stageList.Add(DirectorAPI.Stage.SkyMeadowSimulacrum);
+            stageList.Add(DirectorAPI.Stage.AphelianSanctuarySimulacrum);
+
+            return stageList;
+
+        }
+
+        private List<DirectorAPI.Stage> GetSnowyStageList()
+        {
+            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
+
+            stageList.Add(DirectorAPI.Stage.SiphonedForest);
+            stageList.Add(DirectorAPI.Stage.RallypointDelta);
+
+            stageList.Add(DirectorAPI.Stage.RallypointDeltaSimulacrum);
+
+            return stageList;
+
+        }
+
+        private List<DirectorAPI.Stage> GetSandyStageList()
+        {
+            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
+
+            stageList.Add(DirectorAPI.Stage.AbandonedAqueduct);;
+
+            stageList.Add(DirectorAPI.Stage.AbandonedAqueductSimulacrum);
+
+            return stageList;
+
+        }
+      
+        private void CreateInteractableSpawnCard(GameObject InteractableModel, string name, List<DirectorAPI.Stage> stageList)
         {
             InteractableSpawnCard interactableSpawnCard = ScriptableObject.CreateInstance<InteractableSpawnCard>();
-            interactableSpawnCard.name = "iscShrineRepair";
+            interactableSpawnCard.name = name;
             interactableSpawnCard.prefab = InteractableModel;
             interactableSpawnCard.sendOverNetwork = true;
             interactableSpawnCard.hullSize = HullClassification.Golem;
@@ -217,17 +274,15 @@ namespace ShrineOfRepair.Modules.Interactables
                 selectionWeight = DirectorWeight.Value,
                 spawnCard = interactableSpawnCard,
             };
-
-            DirectorAPI.DirectorCardHolder directorCardHolder = new DirectorAPI.DirectorCardHolder
+            
+            foreach(DirectorAPI.Stage stage in stageList)
             {
-                Card = directorCard,
-                InteractableCategory = DirectorCategory.Value
-            };
+                DirectorAPI.Helpers.AddNewInteractableToStage(directorCard, DirectorCategory.Value, stage);
+            }
 
-            DirectorAPI.Helpers.AddNewInteractable(directorCardHolder);
         }
 
-        public void Hooks()
+        private void Hooks()
         {
             On.RoR2.PurchaseInteraction.GetInteractability += (orig, self, activator) =>
             {
@@ -292,8 +347,15 @@ namespace ShrineOfRepair.Modules.Interactables
             RepairItemsDictionary = ShrineOfRepair.FillRepairItemsDictionary();
         }
 
+        [Server]
         public void RepairPurchaseAttempt(Interactor interactor)
         {
+            if (!NetworkServer.active)
+            {
+                MyLogger.LogWarning("[Server] function 'SrhineOfRepair.Interactables.ShrineOfRepair::RepairPurchaseAttempt(RoR2.Interactor)' called on client");
+                return;
+            }
+
             if (!interactor) { return; }
             var body = interactor.GetComponent<CharacterBody>();
             if (body && body.master)
