@@ -21,8 +21,6 @@ programming, billboard icon, bad model - me
 good model, texturing - Extrabee
 
 ## TODO
-* add snowy and sandy variant if someone explains how hoopo does it
-* make a good billboard icon, preferably with shader similar to other in-game shrines
 * maybe make a version that accounts to which items you repair, so I don't have to use custom formulas and hack game design solutions
 
 ## Version history
