@@ -24,6 +24,7 @@ good model, texturing - Extrabee
 * maybe make a version that accounts to which items you repair, so I don't have to use custom formulas and hack game design solutions
 
 ## Version history
+* 1.1.1 Added shader to billboard icon, added sandy and snowy variants.
 * 1.1.0 Added blacklist, lunar (optional [Ephemeral Coins](https://thunderstore.io/package/VarnaScelestus/Ephemeral_Coins/)) and void coins (with [ReleasedFromTheVoid](https://thunderstore.io/package/Anreol/ReleasedFromTheVoid/)) support
 * 1.0.1 Reupload because r2modman is a good program
 * 1.0.0 Initial release
