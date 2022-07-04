@@ -1,6 +1,17 @@
 # Shrine of Repair
 ![alt text](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/screenshot.jpg)
 
+## Current version
+Risk of Rain 2 mod, adds a shrine to repair broken items. Features scrapper-like UI for selecting which item to repair, showing price per stack. 
+![alt text](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/scrapper_ui.jpg)
+Price scales with time, starting price equals to half of the equal chest price. Starting price is customizable. Config files are not separated into 3 categories:
+* General behavior where you setup model, interactable type and director rules
+* AllInOne where you change pre-1.2.0 variant settings, like price and scaling
+* PerItem where you chance base prices of each item tier.
+
+Pre-1.2.0 behavior can be enabled in General config.
+
+## Pre 1.2.0 version
 Risk of Rain 2 mod, adds a shrine to repair broken items. Features custom price scaling, to account for number of broken items you **might** have in your inventory, so the shrine is cheaper than a single chest early on and gets sharper price increase in the late game compared to the rest of interactable. Everything is customizable (base price, director costs and weights, which formula to use, etc.)
 Custom scaling formula is
 ![diffCoef^customsScalingModifier * BaseCost](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/formula.png)  
@@ -18,12 +29,11 @@ Config also includes option to blacklist items via IDs and usage of different cu
 
 ## Credits
 programming, billboard icon, bad model - me  
-good model, texturing - Extrabee
-
-## TODO
-* maybe make a version that accounts to which items you repair, so I don't have to use custom formulas and hack game design solutions
+good model, texturing - Extrabee  
+help with testing and RoR2 disassembling - vox
 
 ## Version history
+* 1.2.0 Added scrapper-like version (comes with config wipe, sorry).
 * 1.1.1 Added shader to billboard icon, added sandy and snowy variants.
 * 1.1.0 Added blacklist, lunar (optional [Ephemeral Coins](https://thunderstore.io/package/VarnaScelestus/Ephemeral_Coins/)) and void coins (with [ReleasedFromTheVoid](https://thunderstore.io/package/Anreol/ReleasedFromTheVoid/)) support
 * 1.0.1 Reupload because r2modman is a good program
