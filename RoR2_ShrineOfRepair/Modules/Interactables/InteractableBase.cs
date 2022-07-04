@@ -21,7 +21,7 @@ namespace ShrineOfRepair.Modules.Interactables
     {
         public abstract string InteractableLangToken { get; }
 
-        public abstract void Init(ConfigFile config);
+        public abstract void Init();
 
     }
 

@@ -5,7 +5,6 @@ using R2API.Networking;
 using System.Reflection;
 using System.Linq;
 using ShrineOfRepair.Modules.Interactables;
-using RoR2;
 
 namespace ShrineOfRepair.Modules
 {
@@ -21,18 +20,25 @@ namespace ShrineOfRepair.Modules
 
 		private void Awake()
         {
+			#if DEBUG == true
+			On.RoR2.Networking.NetworkManagerSystemSteam.OnClientConnect += (s, u, t) => { };
+			#endif
+
 			PInfo = Info;
 
 			MyLogger = this.Logger;
 
 			new ShrineOfRepairLanguages().Init();
 
+			ShrineOfRepairConfigManager.MainConfigFile = Config;
+			ShrineOfRepairConfigManager.Init();
+
 			var InteractableTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(InteractableBase)));
 
 			foreach(var interactableType in InteractableTypes)
             {
 				InteractableBase interactable = (InteractableBase)System.Activator.CreateInstance(interactableType);
-				interactable.Init(Config);
+				interactable.Init();
 				MyLogger.LogInfo($"Interactable: {interactable.InteractableLangToken} loaded.");
             }
         }
