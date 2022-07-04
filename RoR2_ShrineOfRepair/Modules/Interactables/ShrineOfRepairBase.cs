@@ -117,7 +117,7 @@ namespace ShrineOfRepair.Modules.Interactables
         {
             List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
 
-            stageList.Add(DirectorAPI.Stage.AbandonedAqueduct); ;
+            stageList.Add(DirectorAPI.Stage.AbandonedAqueduct);
 
             stageList.Add(DirectorAPI.Stage.AbandonedAqueductSimulacrum);
 

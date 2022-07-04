@@ -8,7 +8,7 @@ using ShrineOfRepair.Modules.Interactables;
 
 namespace ShrineOfRepair.Modules
 {
-	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.1.1")]
+	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.2.0")]
 	[BepInDependency(R2API.R2API.PluginGUID)]
 	[R2APISubmoduleDependency(nameof(LanguageAPI), nameof(PrefabAPI), nameof(NetworkingAPI), nameof(DirectorAPI))]
 
@@ -30,8 +30,7 @@ namespace ShrineOfRepair.Modules
 
 			new ShrineOfRepairLanguages().Init();
 
-			ShrineOfRepairConfigManager.MainConfigFile = Config;
-			ShrineOfRepairConfigManager.Init();
+			ShrineOfRepairConfigManager.Init(Paths.ConfigPath);
 
 			var InteractableTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(InteractableBase)));
 

@@ -374,10 +374,13 @@ namespace ShrineOfRepair.Modules.Interactables
                     }
                     // lets brute force it because fuck it, what could possibly go wrong
                     // we cant use SetAvailable() because it's not allowed on clients
+                    // and I guess PickupPickerController doesn't sync it for some reason
+                    // unlike PurchaseInteraction
                     pickupPickerController.available = false;
                 }
             }
 
+            // RPC shamelessly stolen from MoreShrines by Evaisa
             static ShrineRepairManager()
             {
                 kRpcHandleInteractionClient = 1268743049; // I guess that's id to separate messages by
