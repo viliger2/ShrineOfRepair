@@ -20,9 +20,9 @@ namespace ShrineOfRepair.Modules
 
 		private void Awake()
         {
-			#if DEBUG == true
-			On.RoR2.Networking.NetworkManagerSystemSteam.OnClientConnect += (s, u, t) => { };
-			#endif
+			//#if DEBUG == true
+			//On.RoR2.Networking.NetworkManagerSystemSteam.OnClientConnect += (s, u, t) => { };
+			//#endif
 
 			PInfo = Info;
 

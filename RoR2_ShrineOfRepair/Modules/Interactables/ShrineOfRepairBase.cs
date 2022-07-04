@@ -15,7 +15,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
         internal abstract GameObject CreateInteractable(GameObject InteractableModel);
 
-        internal static Dictionary<ItemIndex, ItemIndex> FillRepairItemsDictionary()
+        public static Dictionary<ItemIndex, ItemIndex> FillRepairItemsDictionary()
         {
             Dictionary<ItemIndex, ItemIndex> dictionary = new Dictionary<ItemIndex, ItemIndex>();
 
