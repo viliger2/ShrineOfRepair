@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using BepInEx.Configuration;
-using R2API;
-using System;
+﻿using System;
 
 namespace ShrineOfRepair.Modules.Interactables
 {

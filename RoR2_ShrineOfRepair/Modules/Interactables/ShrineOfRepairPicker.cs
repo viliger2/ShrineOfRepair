@@ -1,16 +1,14 @@
-﻿using BepInEx.Configuration;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
+﻿using R2API;
 using RoR2;
-using R2API;
-using System.Linq;
-using static ShrineOfRepair.Modules.ShrineofRepairAssets;
-using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
-using UnityEngine.AddressableAssets;
 using RoR2.UI;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
+using static ShrineOfRepair.Modules.ShrineofRepairAssets;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
-using R2API.Networking.Interfaces;
+using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 
 namespace ShrineOfRepair.Modules.Interactables
 {
@@ -232,7 +230,6 @@ namespace ShrineOfRepair.Modules.Interactables
 
                     if (pickupDef != null)
                     {
-
                         var dictionary = FillRepairItemsDictionary();
 
                         // since broken items by default don't have tier
@@ -246,6 +243,8 @@ namespace ShrineOfRepair.Modules.Interactables
 
                         body.inventory.RemoveItem(pickupDef.itemIndex, numberOfItems);
                         body.inventory.GiveItem(dictionary[pickupDef.itemIndex], numberOfItems);
+
+                        CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, dictionary[pickupDef.itemIndex], CharacterMasterNotificationQueue.TransformationType.Default);
 
                         body.master.money -= cost;
                         MyLogger.LogMessage(string.Format("Player {0} ({1}) paid {2} gold to repair {3}x{4}", body.GetUserName(), body.name, cost, pickupDef.nameToken, numberOfItems));
@@ -266,7 +265,7 @@ namespace ShrineOfRepair.Modules.Interactables
                             baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT"
                         });
 
-                        UnityEngine.Object.Destroy(pickupPickerController.panelInstance);
+                        Destroy(pickupPickerController.panelInstance);
 
                         pickupPickerController.SetAvailable(false);
                     }
@@ -370,7 +369,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 if(pickupPickerController)
                 {
                     if (pickupPickerController.panelInstance) {
-                        UnityEngine.Object.Destroy(pickupPickerController.panelInstance);
+                        Destroy(pickupPickerController.panelInstance);
                     }
                     // lets brute force it because fuck it, what could possibly go wrong
                     // we cant use SetAvailable() because it's not allowed on clients

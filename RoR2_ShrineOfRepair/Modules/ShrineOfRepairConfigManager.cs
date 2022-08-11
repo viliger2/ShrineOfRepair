@@ -1,7 +1,7 @@
 ﻿using BepInEx.Configuration;
 using R2API;
-using static ShrineOfRepair.Modules.Interactables.ShrineOfRepairPurchase;
 using System.IO;
+using static ShrineOfRepair.Modules.Interactables.ShrineOfRepairPurchase;
 
 namespace ShrineOfRepair.Modules
 {

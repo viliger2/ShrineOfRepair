@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
+﻿using R2API;
 using RoR2;
 using RoR2.Hologram;
-using R2API;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Networking;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
-using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
+using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 
 namespace ShrineOfRepair.Modules.Interactables
 {
@@ -169,8 +169,6 @@ namespace ShrineOfRepair.Modules.Interactables
             [SyncVar]
             public int BaseCostDetermination;
 
-            public Dictionary<ItemIndex, ItemIndex> RepairItemsDictionary;
-
             public void Start()
             {
                 if (NetworkServer.active && Run.instance)
@@ -193,8 +191,6 @@ namespace ShrineOfRepair.Modules.Interactables
                     BaseCostDetermination = PurchaseInteraction.cost;
                     PurchaseInteraction.cost = BaseCostDetermination;
                 }
-
-                RepairItemsDictionary = ShrineOfRepairPurchase.FillRepairItemsDictionary();
             }
 
             [Server]
@@ -211,7 +207,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 if (body && body.master)
                 {
                     var inventory = body.inventory;
-                    foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in RepairItemsDictionary)
+                    foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in FillRepairItemsDictionary())
                     {
                         int numberOfItems = inventory.GetItemCount(pairedItems.Key);
                         if (numberOfItems > 0)

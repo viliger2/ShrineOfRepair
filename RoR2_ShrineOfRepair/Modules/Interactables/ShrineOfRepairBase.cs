@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using R2API;
 using RoR2;
-using R2API;
+using System.Collections.Generic;
 using UnityEngine;
-using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
+using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 
 namespace ShrineOfRepair.Modules.Interactables
 {
@@ -34,6 +32,8 @@ namespace ShrineOfRepair.Modules.Interactables
                     dictionary.Remove(itemIndex);
                 }
             }
+
+            dictionary = ModExtension.FillDictionaryFromMods(dictionary);
 
             return dictionary;
         }
