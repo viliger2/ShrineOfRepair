@@ -5,9 +5,8 @@ using static ShrineOfRepair.Modules.Interactables.ShrineOfRepairPurchase;
 
 namespace ShrineOfRepair.Modules
 {
-    public static class ShrineOfRepairConfigManager
+    public class ShrineOfRepairConfigManager
     {
-
         // general values
         public static ConfigEntry<int> DirectorCost;
         public static ConfigEntry<int> DirectorWeight;
@@ -35,7 +34,7 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<int> PickerPanelGoldTier2Cost;
         public static ConfigEntry<int> PickerPanelGoldTier3Cost;
 
-        public static void Init(string configPath)
+        public void Init(string configPath)
         {
             var mainConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-General.cfg"), true);
 

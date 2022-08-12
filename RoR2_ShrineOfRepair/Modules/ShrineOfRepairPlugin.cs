@@ -32,7 +32,7 @@ namespace ShrineOfRepair.Modules
 
 			new ShrineOfRepairLanguages().Init();
 
-			ShrineOfRepairConfigManager.Init(Paths.ConfigPath);
+			new ShrineOfRepairConfigManager().Init(Paths.ConfigPath);
 
 			var InteractableTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(InteractableBase)));
 

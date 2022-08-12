@@ -1,37 +1,45 @@
 ﻿using RoR2;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 
 namespace ShrineOfRepair.Modules
 {
     public class ModExtension
     {
-        // if you want to add your own item just call AddListener with a method
-        // that has ref Dictionary<ItemIndex, ItemIndex> as an only parameter
-        // in method itself you can add itemIndexes of items you want to repair from and into
-        // as key and value respectively, and don't forget to check for duplicates in dictionary,
-        // since I am not sure at the moment on how you can implement it here
-        public delegate void DictionaryFillDelegate(ref Dictionary<ItemIndex, ItemIndex> dict);
+        // 
+        public delegate void DictionaryFillDelegate(ref List<RepairableItems> list);
 
-        private static DictionaryFillDelegate dictionaryFillHandler;
+        public class RepairableItems
+        {
+            public ItemIndex brokenItem;
+            public ItemIndex repairedItem;
+        }
 
-        private static Dictionary<ItemIndex, ItemIndex> ModdedItemsDictionary = new Dictionary<ItemIndex, ItemIndex>();
+        private static DictionaryFillDelegate fillDictionaryHandler;
+
+        private static List<RepairableItems> ModdedItemsList = new List<RepairableItems>();
 
         public static void AddListener(DictionaryFillDelegate callback)
         {
-            dictionaryFillHandler += callback;
+            fillDictionaryHandler += callback;
             MyLogger.LogMessage($"Added {callback.Method} to dictionaryFillHandler");
         }
 
         public static Dictionary<ItemIndex, ItemIndex> FillDictionaryFromMods(Dictionary<ItemIndex, ItemIndex> dictionary)
         {
-            dictionaryFillHandler(ref ModdedItemsDictionary);
-
-            foreach (var item in ModdedItemsDictionary)
+            if (ModdedItemsList.Count == 0)
             {
-                if (!dictionary.ContainsKey(item.Key))
+                fillDictionaryHandler?.Invoke(ref ModdedItemsList);
+            }
+
+            foreach (var item in ModdedItemsList)
+            {
+                if (!dictionary.ContainsKey(item.brokenItem))
                 {
-                    dictionary.Add(item.Key, item.Value);
+                    dictionary.Add(item.brokenItem, item.repairedItem);
+                    MyLogger.LogMessage(string.Format("Added repairs from {0} to {1} from a mod.", RoR2.ItemCatalog.GetItemDef(item.brokenItem)?.name, RoR2.ItemCatalog.GetItemDef(item.repairedItem).name));
                 }
             }
 

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace ShrineOfRepair.Modules
 {
-    public static class ShrineofRepairAssets
+    public class ShrineofRepairAssets
     {
         public static AssetBundle MainBundle;
 
@@ -19,7 +19,7 @@ namespace ShrineOfRepair.Modules
             }
         }
 
-        public static void Init()
+        public void Init()
         {
             MainBundle = AssetBundle.LoadFromFile(AssetBundlePath);
         }

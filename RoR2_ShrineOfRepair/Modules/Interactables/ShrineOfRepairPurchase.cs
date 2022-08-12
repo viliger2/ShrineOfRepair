@@ -25,8 +25,7 @@ namespace ShrineOfRepair.Modules.Interactables
         {
             if (!UsePickupPickerPanel.Value)
             {
-                ShrineofRepairAssets.Init();
-
+                new ShrineofRepairAssets().Init();
                 CreateInteractables();
                 Hooks();
             }

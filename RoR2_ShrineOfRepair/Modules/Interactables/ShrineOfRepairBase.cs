@@ -13,14 +13,16 @@ namespace ShrineOfRepair.Modules.Interactables
 
         internal abstract GameObject CreateInteractable(GameObject InteractableModel);
 
+        private static Dictionary<ItemIndex, ItemIndex> RepairItemsDictionary = new Dictionary<ItemIndex, ItemIndex>();
+
         public static Dictionary<ItemIndex, ItemIndex> FillRepairItemsDictionary()
         {
-            Dictionary<ItemIndex, ItemIndex> dictionary = new Dictionary<ItemIndex, ItemIndex>();
+            if (RepairItemsDictionary.Count != 0) { return RepairItemsDictionary; }
 
-            dictionary.Add(DLC1Content.Items.FragileDamageBonusConsumed.itemIndex, DLC1Content.Items.FragileDamageBonus.itemIndex); // watch
-            dictionary.Add(DLC1Content.Items.HealingPotionConsumed.itemIndex, DLC1Content.Items.HealingPotion.itemIndex); // potion
-            dictionary.Add(RoR2Content.Items.ExtraLifeConsumed.itemIndex, RoR2Content.Items.ExtraLife.itemIndex); // dio
-            dictionary.Add(DLC1Content.Items.ExtraLifeVoidConsumed.itemIndex, DLC1Content.Items.ExtraLifeVoid.itemIndex); // larva
+            RepairItemsDictionary.Add(DLC1Content.Items.FragileDamageBonusConsumed.itemIndex, DLC1Content.Items.FragileDamageBonus.itemIndex); // watch
+            RepairItemsDictionary.Add(DLC1Content.Items.HealingPotionConsumed.itemIndex, DLC1Content.Items.HealingPotion.itemIndex); // potion
+            RepairItemsDictionary.Add(RoR2Content.Items.ExtraLifeConsumed.itemIndex, RoR2Content.Items.ExtraLife.itemIndex); // dio
+            RepairItemsDictionary.Add(DLC1Content.Items.ExtraLifeVoidConsumed.itemIndex, DLC1Content.Items.ExtraLifeVoid.itemIndex); // larva
 
             // ItemIndex enums are index numbers from "Item & Equipment IDs and Names" page
             var itemIds = Blacklist.Value.Split(',');
@@ -29,13 +31,13 @@ namespace ShrineOfRepair.Modules.Interactables
                 ItemIndex itemIndex;
                 if (System.Enum.TryParse(itemId.Trim(), out itemIndex))
                 {
-                    dictionary.Remove(itemIndex);
+                    RepairItemsDictionary.Remove(itemIndex);
                 }
             }
 
-            dictionary = ModExtension.FillDictionaryFromMods(dictionary);
+            RepairItemsDictionary = ModExtension.FillDictionaryFromMods(RepairItemsDictionary);
 
-            return dictionary;
+            return RepairItemsDictionary;
         }
 
         internal void CreateInteractables()
