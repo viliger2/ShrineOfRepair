@@ -231,8 +231,11 @@ namespace ShrineOfRepair.Modules.Interactables
                         color = (Color32)Color.red
                     }, true);
 
-                    var billboard = gameObject.transform.Find("Icon").gameObject;
-                    billboard.SetActive(false);
+                    if (!UseMultipleTimes.Value)
+                    {
+                        var billboard = gameObject.transform.Find("Icon").gameObject;
+                        billboard.SetActive(false);
+                    }
 
                     Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                     {
@@ -240,10 +243,8 @@ namespace ShrineOfRepair.Modules.Interactables
                         baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT"
                     });
 
-                    if (NetworkServer.active)
-                    {
+                    if (NetworkServer.active && !UseMultipleTimes.Value)
                         PurchaseInteraction.SetAvailable(false);
-                    }
                 }
             }
 

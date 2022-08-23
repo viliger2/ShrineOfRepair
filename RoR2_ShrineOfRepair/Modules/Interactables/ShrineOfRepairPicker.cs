@@ -274,7 +274,7 @@ namespace ShrineOfRepair.Modules.Interactables
                             color = (Color32)Color.red
                         }, true);
 
-                        iconTransform.gameObject.SetActive(false);
+                        if (!UseMultipleTimes.Value) iconTransform.gameObject.SetActive(false);
 
                         Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                         {
@@ -284,7 +284,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
                         Destroy(pickupPickerController.panelInstance);
 
-                        pickupPickerController.SetAvailable(false);
+                        if (!UseMultipleTimes.Value) pickupPickerController.SetAvailable(false);
                     }
                 }
             }
@@ -379,7 +379,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 writer.Write((short)2);
                 writer.WritePackedUInt32((uint)kRpcHandleInteractionClient);
                 writer.Write(GetComponent<NetworkIdentity>().netId);
-                this.SendRPCInternal(writer, 0, "RpcHandleInteractionClient");
+                SendRPCInternal(writer, 0, "RpcHandleInteractionClient");
             }
 
             protected static void InvokeRpcHandleInteractionClient(NetworkBehaviour obj, NetworkReader reader)
@@ -400,7 +400,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 MyLogger.LogMessage("RPC RpcHandleInteactionClient message recieved");
                 if (iconTransform)
                 {
-                    iconTransform.gameObject.SetActive(false);
+                    if (!UseMultipleTimes.Value) iconTransform.gameObject.SetActive(false);
                 }
                 if(pickupPickerController)
                 {
@@ -411,7 +411,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     // we cant use SetAvailable() because it's not allowed on clients
                     // and I guess PickupPickerController doesn't sync it for some reason
                     // unlike PurchaseInteraction
-                    pickupPickerController.available = false;
+                    if (!UseMultipleTimes.Value) pickupPickerController.available = false;
                 }
             }
 

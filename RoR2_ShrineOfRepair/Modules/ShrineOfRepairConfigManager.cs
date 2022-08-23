@@ -18,6 +18,8 @@ namespace ShrineOfRepair.Modules
 
         public static ConfigEntry<bool> UsePickupPickerPanel;
 
+        public static ConfigEntry<bool> UseMultipleTimes;
+
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
 
@@ -50,6 +52,8 @@ namespace ShrineOfRepair.Modules
             RepairList = mainConfig.Bind("RepairList", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter", "Main Repair List, syntax: (broken) - (new), delimiter: ','");
 
             UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
+
+            UseMultipleTimes = mainConfig.Bind("UseMultipleTimes", "Use Multiple Times", false, "Set to true to keep the shrine from deactivating after use");
 
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 
