@@ -1,9 +1,9 @@
 # Shrine of Repair
-![alt text](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/screenshot.jpg)
+![Shrine Screenshot](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/screenshot.jpg)
 
 ## Current version
 Risk of Rain 2 mod, adds a shrine to repair broken items. Features scrapper-like UI for selecting which item to repair, showing price per stack. 
-![alt text](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/scrapper_ui.jpg)
+![GUI Screenshot](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/scrapper_ui.jpg)
 Price scales with time, starting price equals to half of the equal chest price. Starting price is customizable. Config files are not separated into 3 categories:
 * General behavior where you setup model, interactable type and director rules
 * AllInOne where you change pre-1.2.0 variant settings, like price and scaling
@@ -33,6 +33,7 @@ good model, texturing - Extrabee
 help with testing and RoR2 disassembling - vox
 
 ## Version history
+* 1.3.0 Added Custom Repair Config, Equipment Repair, Boss/Lunar/Equipment Cost Config and Void Lunar compat. It also added Regenerating Scrap and Trophy Hunter's Tricorn by default in addition to the other 4.
 * 1.2.0 Added scrapper-like version (comes with config wipe, sorry).
 * 1.1.1 Added shader to billboard icon, added sandy and snowy variants.
 * 1.1.0 Added blacklist, lunar (optional [Ephemeral Coins](https://thunderstore.io/package/VarnaScelestus/Ephemeral_Coins/)) and void coins (with [ReleasedFromTheVoid](https://thunderstore.io/package/Anreol/ReleasedFromTheVoid/)) support
