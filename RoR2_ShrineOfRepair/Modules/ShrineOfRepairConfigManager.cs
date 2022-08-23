@@ -14,7 +14,7 @@ namespace ShrineOfRepair.Modules
 
         public static ConfigEntry<bool> UseBadModel;
 
-        public static ConfigEntry<string> Blacklist;
+        public static ConfigEntry<string> RepairList;
 
         public static ConfigEntry<bool> UsePickupPickerPanel;
 
@@ -33,6 +33,9 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<int> PickerPanelGoldTier1Cost;
         public static ConfigEntry<int> PickerPanelGoldTier2Cost;
         public static ConfigEntry<int> PickerPanelGoldTier3Cost;
+        public static ConfigEntry<int> PickerPanelGoldBossCost;
+        public static ConfigEntry<int> PickerPanelGoldLunarCost;
+        public static ConfigEntry<int> PickerPanelGoldEquipCost;
 
         public void Init(string configPath)
         {
@@ -44,7 +47,7 @@ namespace ShrineOfRepair.Modules
             DirectorWeight = mainConfig.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
             DirectorCategory = mainConfig.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
 
-            Blacklist = mainConfig.Bind("Blacklist", "Blacklist", "", "Blacklist for items. Adding an item to the list will make them unrepairable. List should consists of item ids separated by commas and everything else will be (hopefully) ignored. IDs for Hoopo items:\nDelicate Watch (Broken) - 68, Empty Bottle - 81, Dio's Best Friend (Consumed) - 57, Pluripotent Larva (Consumed) - 59");
+            RepairList = mainConfig.Bind("RepairList", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter", "Main Repair List, syntax: (broken) - (new), delimiter: ','");
 
             UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
 
@@ -64,7 +67,10 @@ namespace ShrineOfRepair.Modules
 
             PickerPanelGoldTier1Cost = perItemConfig.Bind("Per Item Repairs", "Tier 1 cost", 12, "Base cost of tier 1 (white) item repair. By default the cost is equal to the half of normal chest price, rounded down.");
             PickerPanelGoldTier2Cost = perItemConfig.Bind("Per Item Repairs", "Tier 2 cost", 25, "Base cost of tier 2 (green) item repair. By default the cost is equal to the half of large chest price.");
-            PickerPanelGoldTier3Cost = perItemConfig.Bind("Per Item Repairs", "Tier 3 cost", 200, "Base cost of tier 3 (red) item repair. By default the cost is eqyal to the half of legendary chest price.");
+            PickerPanelGoldTier3Cost = perItemConfig.Bind("Per Item Repairs", "Tier 3 cost", 200, "Base cost of tier 3 (red) item repair. By default the cost is equal to the half of legendary chest price.");
+            PickerPanelGoldBossCost = perItemConfig.Bind("Per Item Repairs", "Boss cost", 50, "Base cost of boss (yellow) item repair. By default the cost is equal to double tier 2 repair price.");
+            PickerPanelGoldLunarCost = perItemConfig.Bind("Per Item Repairs", "Lunar cost", 25, "Base cost of lunar (blue) item repair. By default the cost is equal to the half of large chest price.");
+            PickerPanelGoldEquipCost = perItemConfig.Bind("Per Item Repairs", "Equipment cost", 50, "Base cost of equipments (orange) repair. By default the cost is equal to double tier 2 repair price.");
         }
 
     }

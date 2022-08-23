@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="BubbetsItems">
+      <HintPath>..\..\..\..\..\..\..\..\Games\steamapps\common\Risk of Rain 2\_mods\RiskOfRain2\profiles\monkey2\BepInEx\plugins\Bubbet-BubbetsItems\BubbetsItems.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Assets\firstitem_assets">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>

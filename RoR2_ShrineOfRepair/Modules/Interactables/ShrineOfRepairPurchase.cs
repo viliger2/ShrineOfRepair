@@ -144,14 +144,16 @@ namespace ShrineOfRepair.Modules.Interactables
                     {
                         bool isShrineAvailable = false;
 
-                        var dictionary = FillRepairItemsDictionary();
-                        foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in dictionary)
+                        FillRepairItemsDictionary();
+                        foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in RepairItemsDictionary)
                         {
                             if (body.inventory.GetItemCount(pairedItems.Key) > 0)
                             {
                                 isShrineAvailable = true;
                             }
                         }
+                        if (RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex)) isShrineAvailable = true;
+                        MyLogger.LogInfo("Trying to interact: " + isShrineAvailable);
                         if (!isShrineAvailable) { return Interactability.ConditionsNotMet; }
                     }
                 }
@@ -197,7 +199,7 @@ namespace ShrineOfRepair.Modules.Interactables
             {
                 if (!NetworkServer.active)
                 {
-                    MyLogger.LogWarning("[Server] function 'SrhineOfRepair.Interactables.ShrineOfRepair::RepairPurchaseAttempt(RoR2.Interactor)' called on client");
+                    MyLogger.LogWarning("[Server] function 'ShrineOfRepair.Interactables.ShrineOfRepair::RepairPurchaseAttempt(RoR2.Interactor)' called on client");
                     return;
                 }
 
@@ -206,7 +208,8 @@ namespace ShrineOfRepair.Modules.Interactables
                 if (body && body.master)
                 {
                     var inventory = body.inventory;
-                    foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in FillRepairItemsDictionary())
+                    FillRepairItemsDictionary();
+                    foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in RepairItemsDictionary)
                     {
                         int numberOfItems = inventory.GetItemCount(pairedItems.Key);
                         if (numberOfItems > 0)
@@ -214,6 +217,10 @@ namespace ShrineOfRepair.Modules.Interactables
                             inventory.RemoveItem(pairedItems.Key, numberOfItems);
                             inventory.GiveItem(pairedItems.Value, numberOfItems);
                         }
+                    }
+                    if (RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex))
+                    {
+                        inventory.SetEquipmentIndex(RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex]);
                     }
 
                     EffectManager.SpawnEffect(Resources.Load<GameObject>("Prefabs/Effects/ShrineUseEffect"), new EffectData()

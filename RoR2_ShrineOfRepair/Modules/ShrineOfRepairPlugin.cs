@@ -5,14 +5,14 @@ using R2API.Networking;
 using System.Reflection;
 using System.Linq;
 using ShrineOfRepair.Modules.Interactables;
-using RoR2;
-using System.Collections.Generic;
 
 namespace ShrineOfRepair.Modules
 {
-	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.2.1")]
+	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.3.0")]
 	[BepInDependency(R2API.R2API.PluginGUID)]
 	[R2APISubmoduleDependency(nameof(LanguageAPI), nameof(PrefabAPI), nameof(NetworkingAPI), nameof(DirectorAPI))]
+
+	[BepInDependency("bubbet.bubbetsitems", BepInDependency.DependencyFlags.SoftDependency)]
 
 	public class ShrineOfRepairPlugin : BaseUnityPlugin
 	{
@@ -28,7 +28,7 @@ namespace ShrineOfRepair.Modules
 
 			PInfo = Info;
 
-			MyLogger = this.Logger;
+			MyLogger = Logger;
 
 			new ShrineOfRepairLanguages().Init();
 
