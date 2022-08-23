@@ -87,7 +87,7 @@ namespace ShrineOfRepair.Modules.Interactables
             component.material.SetColor("_TintColor", color);
 
             // provides a manager than handles what happens when you interact with object
-            var shrineManager = InteractableModel.AddComponent<ShrineOfRepairPicker.ShrineRepairManager>();
+            var shrineManager = InteractableModel.AddComponent<ShrineRepairManager>();
             shrineManager.pickupPickerController = pickerController;
             shrineManager.iconTransform = icon;
 
@@ -152,6 +152,7 @@ namespace ShrineOfRepair.Modules.Interactables
         {
             public PickupPickerController pickupPickerController;
             public Transform iconTransform;
+            private int uses = 0;
 
             [SyncVar]
             public float coefficient;
@@ -274,8 +275,6 @@ namespace ShrineOfRepair.Modules.Interactables
                             color = (Color32)Color.red
                         }, true);
 
-                        if (!UseMultipleTimes.Value) iconTransform.gameObject.SetActive(false);
-
                         Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                         {
                             subjectAsCharacterBody = body,
@@ -284,7 +283,11 @@ namespace ShrineOfRepair.Modules.Interactables
 
                         Destroy(pickupPickerController.panelInstance);
 
-                        if (!UseMultipleTimes.Value) pickupPickerController.SetAvailable(false);
+                        if (MaxUses.Value > 0 && uses == MaxUses.Value)
+                        {
+                            iconTransform.gameObject.SetActive(false);
+                            pickupPickerController.SetAvailable(false);
+                        }
                     }
                 }
             }
@@ -398,9 +401,10 @@ namespace ShrineOfRepair.Modules.Interactables
             public void RpcHandleInteactionClient()
             {
                 MyLogger.LogMessage("RPC RpcHandleInteactionClient message recieved");
+                uses++;
                 if (iconTransform)
                 {
-                    if (!UseMultipleTimes.Value) iconTransform.gameObject.SetActive(false);
+                    if (MaxUses.Value > 0 && uses == MaxUses.Value) iconTransform.gameObject.SetActive(false);
                 }
                 if(pickupPickerController)
                 {
@@ -411,7 +415,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     // we cant use SetAvailable() because it's not allowed on clients
                     // and I guess PickupPickerController doesn't sync it for some reason
                     // unlike PurchaseInteraction
-                    if (!UseMultipleTimes.Value) pickupPickerController.available = false;
+                    if (MaxUses.Value > 0 && uses == MaxUses.Value) pickupPickerController.available = false;
                 }
             }
 

@@ -33,7 +33,7 @@ good model, texturing - Extrabee
 help with testing and RoR2 disassembling - vox
 
 ## Version history
-* 1.3.0 Added Custom Repair Config, Equipment Repair, Use Multiple Times Config, Boss/Lunar/Equipment Cost Config and Void Lunar compat. It also added Regenerating Scrap and Trophy Hunter's Tricorn by default in addition to the other 4.
+* 1.3.0 Added Custom Repair Config, Equipment Repair, Max Uses Config, Boss/Lunar/Equipment Cost Config and Void Lunar compat. It also added Regenerating Scrap and Trophy Hunter's Tricorn by default in addition to the other 4.
 * 1.2.0 Added scrapper-like version (comes with config wipe, sorry).
 * 1.1.1 Added shader to billboard icon, added sandy and snowy variants.
 * 1.1.0 Added blacklist, lunar (optional [Ephemeral Coins](https://thunderstore.io/package/VarnaScelestus/Ephemeral_Coins/)) and void coins (with [ReleasedFromTheVoid](https://thunderstore.io/package/Anreol/ReleasedFromTheVoid/)) support

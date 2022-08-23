@@ -18,7 +18,7 @@ namespace ShrineOfRepair.Modules
 
         public static ConfigEntry<bool> UsePickupPickerPanel;
 
-        public static ConfigEntry<bool> UseMultipleTimes;
+        public static ConfigEntry<int> MaxUses;
 
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
@@ -49,11 +49,11 @@ namespace ShrineOfRepair.Modules
             DirectorWeight = mainConfig.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
             DirectorCategory = mainConfig.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
 
-            RepairList = mainConfig.Bind("RepairList", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter", "Main Repair List, syntax: (broken) - (new), delimiter: ','");
+            RepairList = mainConfig.Bind("General", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter", "Main Repair List, syntax: (broken) - (new), delimiter: ','");
 
-            UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
+            UsePickupPickerPanel = mainConfig.Bind("General", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
 
-            UseMultipleTimes = mainConfig.Bind("UseMultipleTimes", "Use Multiple Times", false, "Set to true to keep the shrine from deactivating after use");
+            MaxUses = mainConfig.Bind("General", "Max Uses", 1, "Max amount of uses. set to 0 for infinite.");
 
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 
