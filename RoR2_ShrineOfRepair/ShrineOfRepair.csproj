@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="BubbetsItems">
+      <HintPath>bin\Debug\netstandard2.0\BubbetsItems.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Assets\firstitem_assets">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>

@@ -39,7 +39,7 @@ namespace ShrineOfRepair.Modules
                 if (!dictionary.ContainsKey(item.brokenItem))
                 {
                     dictionary.Add(item.brokenItem, item.repairedItem);
-                    MyLogger.LogMessage(string.Format("Added repairs from {0} to {1} from a mod.", RoR2.ItemCatalog.GetItemDef(item.brokenItem)?.name, RoR2.ItemCatalog.GetItemDef(item.repairedItem).name));
+                    MyLogger.LogMessage(string.Format("Added repairs from {0} to {1} from a mod.", ItemCatalog.GetItemDef(item.brokenItem)?.name, ItemCatalog.GetItemDef(item.repairedItem).name));
                 }
             }
 

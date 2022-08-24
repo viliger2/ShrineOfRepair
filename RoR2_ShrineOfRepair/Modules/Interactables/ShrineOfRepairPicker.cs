@@ -9,11 +9,15 @@ using UnityEngine.Networking;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
+using BepInEx.Bootstrap;
+using BubbetsItems;
 
 namespace ShrineOfRepair.Modules.Interactables
 {
     public class ShrineOfRepairPicker : ShrineOfRepairBase<ShrineOfRepairPicker>
     {
+
+        private static bool VoidLunarEnabled => Chainloader.PluginInfos.ContainsKey("bubbet.bubbetsitems");
 
         public override void Init()
         {
@@ -130,14 +134,13 @@ namespace ShrineOfRepair.Modules.Interactables
                     {
                         bool isShrineAvailable = false;
 
-                        var dictionary = FillRepairItemsDictionary();
-                        foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in dictionary)
-                        {
+                        FillRepairItemsDictionary();
+                        foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in RepairItemsDictionary)
                             if (body.inventory.GetItemCount(pairedItems.Key) > 0)
-                            {
                                 isShrineAvailable = true;
-                            }
-                        }
+                        foreach (KeyValuePair<EquipmentIndex, EquipmentIndex> pairedItems in RepairEquipmentsDictionary)
+                            if (body.equipmentSlot.equipmentIndex == pairedItems.Key)
+                                isShrineAvailable = true;
                         if (!isShrineAvailable) { return Interactability.ConditionsNotMet; }
                     }
                 }
@@ -167,17 +170,21 @@ namespace ShrineOfRepair.Modules.Interactables
                 On.RoR2.UI.PickupPickerPanel.OnCreateButton += (orig, self, index, button) =>
                 {
                     orig(self, index, button);
-
                     if (self.name.Contains("ShrineRepair") && self == pickupPickerController.panelInstanceController)
                     {
                         CharacterMaster master = interactor ? interactor.GetComponent<CharacterBody>().master : LocalUserManager.GetFirstLocalUser().cachedMasterController.master;
 
                         PickupDef pickupDef = PickupCatalog.GetPickupDef(self.pickerController.options[index].pickupIndex);
+                        FillRepairItemsDictionary();
+                        ItemIndex itemIndex;
+                        bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out itemIndex);
+                        int count = master.inventory.GetItemCount(pickupDef.itemIndex);
+                        ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
 
-                        if (pickupDef.itemIndex != ItemIndex.None)
+                        if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                         {
-                            int count = master.inventory.GetItemCount(pickupDef.itemIndex);
-                            MyLogger.LogMessage(string.Format("Price for {0}x{1} is {2}", pickupDef.nameToken, count, GetTotalStackCost(RoR2.ItemCatalog.GetItemDef(FillRepairItemsDictionary()[pickupDef.itemIndex]).tier, count)));
+
+                            MyLogger.LogMessage(string.Format("Price for {0}x{1} is {2}", pickupDef.nameToken, count, isItem ? GetTotalStackCost(tier, count) : (uint)PickerPanelGoldEquipCost.Value));
 
                             GameObject textGameObject = new GameObject("CostText");
                             textGameObject.transform.SetParent(button.transform);
@@ -191,7 +198,7 @@ namespace ShrineOfRepair.Modules.Interactables
                             counterText.fontSize = 20f;
                             counterText.faceColor = Color.yellow;
                             counterText.outlineWidth = 0.2f;
-                            counterText.text = "$" + GetTotalStackCost(RoR2.ItemCatalog.GetItemDef(FillRepairItemsDictionary()[pickupDef.itemIndex]).tier, count);
+                            counterText.text = "$" + (isItem ? GetTotalStackCost(tier, count) : (uint)PickerPanelGoldEquipCost.Value);
 
                             counterRect.localPosition = Vector3.zero;
                             counterRect.anchorMin = Vector2.zero;
@@ -216,7 +223,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 CallRpcHandleInteractionClient();
                 if (!NetworkServer.active)
                 {
-                    MyLogger.LogWarning("[Server] function 'SrhineOfRepair.Interactables.ShrineOfRepairManager::HandleSelection(int)' called on client");
+                    MyLogger.LogWarning("[Server] function 'ShrineOfRepair.Interactables.ShrineOfRepairManager::HandleSelection(int)' called on client");
                     return;
                 }
 
@@ -227,24 +234,34 @@ namespace ShrineOfRepair.Modules.Interactables
                     PickupDef pickupDef = PickupCatalog.GetPickupDef(new PickupIndex(selection));
                     CharacterBody body = interactor.GetComponent<CharacterBody>();
                     int numberOfItems = body.inventory.GetItemCount(pickupDef.itemIndex);
+                    FillRepairItemsDictionary();
 
-                    if (pickupDef != null)
+                    // since broken items by default don't have tier
+                    // we use our dictionary to get itemTier of non-broken item
+                    ItemIndex itemIndex;
+                    bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out itemIndex);
+                    ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
+
+                    if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                     {
-                        var dictionary = FillRepairItemsDictionary();
-
-                        // since broken items by default don't have tier
-                        // we use our dictionary to get itemTier of non-broken item
-                        uint cost = GetTotalStackCost(RoR2.ItemCatalog.GetItemDef(dictionary[pickupDef.itemIndex]).tier, numberOfItems);
+                        uint cost = isItem ? GetTotalStackCost(tier, numberOfItems) : (uint)PickerPanelGoldEquipCost.Value;
                         if (cost > body.master.money)
                         {
                             MyLogger.LogWarning(string.Format("Somehow player {0} ({1}) has less money than price of {2}x{3}, yet it was available at the start of interaction. Doing nothing...", body.GetUserName(), body.name, pickupDef.nameToken, numberOfItems));
                             return;
                         }
 
-                        body.inventory.RemoveItem(pickupDef.itemIndex, numberOfItems);
-                        body.inventory.GiveItem(dictionary[pickupDef.itemIndex], numberOfItems);
-
-                        CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, dictionary[pickupDef.itemIndex], CharacterMasterNotificationQueue.TransformationType.Default);
+                        if (isItem)
+                        {
+                            body.inventory.RemoveItem(pickupDef.itemIndex, numberOfItems);
+                            body.inventory.GiveItem(itemIndex, numberOfItems);
+                            CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                        }
+                        else
+                        {
+                            body.inventory.SetEquipmentIndex(RepairEquipmentsDictionary[pickupDef.equipmentIndex]);
+                            CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, pickupDef.equipmentIndex, RepairEquipmentsDictionary[pickupDef.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
+                        }
 
                         body.master.money -= cost;
                         MyLogger.LogMessage(string.Format("Player {0} ({1}) paid {2} gold to repair {3}x{4}", body.GetUserName(), body.name, cost, pickupDef.nameToken, numberOfItems));
@@ -277,7 +294,7 @@ namespace ShrineOfRepair.Modules.Interactables
             {
                 if (!NetworkServer.active)
                 {
-                    MyLogger.LogWarning("[Server] function 'SrhineOfRepair.Interactables.ShrineOfRepairManager::HandleInteraction(RoR2.Interactor)' called on client");
+                    MyLogger.LogWarning("[Server] function 'ShrineOfRepair.Interactables.ShrineOfRepairManager::HandleInteraction(RoR2.Interactor)' called on client");
                     return;
                 }
 
@@ -288,18 +305,26 @@ namespace ShrineOfRepair.Modules.Interactables
                 var charBody = interactor.GetComponent<CharacterBody>();
                 if (charBody && charBody.master)
                 {
-                    var dictionary = ShrineOfRepairPicker.FillRepairItemsDictionary();
-                    foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in dictionary)
+                    FillRepairItemsDictionary();
+                    foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in RepairItemsDictionary)
                     {
                         var itemCount = charBody.inventory.GetItemCount(pairedItems.Key);
                         if (itemCount > 0)
                         {
                             options.Add(new PickupPickerController.Option
                             {
-                                available = charBody.master.money > GetTotalStackCost(RoR2.ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount),
+                                available = charBody.master.money > GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount),
                                 pickupIndex = PickupCatalog.FindPickupIndex(pairedItems.Key)
                             });
                         }
+                    }
+                    if (RepairEquipmentsDictionary.ContainsKey(charBody.equipmentSlot.equipmentIndex))
+                    {
+                        options.Add(new PickupPickerController.Option
+                        {
+                            available = charBody.master.money > PickerPanelGoldEquipCost.Value,
+                            pickupIndex = PickupCatalog.FindPickupIndex(charBody.equipmentSlot.equipmentIndex)
+                        });
                     }
 
                     pickupPickerController.SetOptionsServer(options.ToArray());
@@ -308,6 +333,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
             private int GetCostFromItemTier(ItemTier tier)
             {
+                if (VoidLunarEnabled && isVoidLunar(tier)) return PickerPanelGoldLunarCost.Value;
                 switch (tier)
                 {
                     case ItemTier.Tier1:
@@ -320,7 +346,17 @@ namespace ShrineOfRepair.Modules.Interactables
                     case ItemTier.Tier3:
                     case ItemTier.VoidTier3:
                         return PickerPanelGoldTier3Cost.Value;
+                    case ItemTier.Boss:
+                    case ItemTier.VoidBoss:
+                        return PickerPanelGoldBossCost.Value;
+                    case ItemTier.Lunar:
+                        return PickerPanelGoldLunarCost.Value;
                 }
+            }
+
+            private bool isVoidLunar(ItemTier tier)
+            {
+                return tier == BubbetsItemsPlugin.VoidLunarTier.tier;
             }
 
             private uint GetTotalStackCost(ItemTier tier, int numberOfItems)
@@ -383,7 +419,7 @@ namespace ShrineOfRepair.Modules.Interactables
             static ShrineRepairManager()
             {
                 kRpcHandleInteractionClient = 1268743049; // I guess that's id to separate messages by
-                NetworkBehaviour.RegisterRpcDelegate(typeof(ShrineRepairManager), kRpcHandleInteractionClient, InvokeRpcHandleInteractionClient);
+                RegisterRpcDelegate(typeof(ShrineRepairManager), kRpcHandleInteractionClient, InvokeRpcHandleInteractionClient);
                 NetworkCRC.RegisterBehaviour("ShrineRepairManager", 0);
             }
         }
