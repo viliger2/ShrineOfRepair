@@ -1,5 +1,5 @@
 {
-	"en": {
+	"strings": {
 		"INTERACTABLE_SHRINE_REPAIR_NAME": "Shrine of Repair",
 		"INTERACTABLE_SHRINE_REPAIR_CONTEXT": "Repair items?",
 		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">You repaired items.</style>",
