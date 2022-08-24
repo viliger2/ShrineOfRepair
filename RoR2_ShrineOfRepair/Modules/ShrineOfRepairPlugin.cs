@@ -1,14 +1,14 @@
 ﻿using BepInEx;
 using R2API;
-using R2API.Utils;
 using R2API.Networking;
-using System.Reflection;
-using System.Linq;
+using R2API.Utils;
 using ShrineOfRepair.Modules.Interactables;
+using System.Linq;
+using System.Reflection;
 
 namespace ShrineOfRepair.Modules
 {
-	[BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.3.0")]
+    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.2.2")]
 	[BepInDependency(R2API.R2API.PluginGUID)]
 	[R2APISubmoduleDependency(nameof(LanguageAPI), nameof(PrefabAPI), nameof(NetworkingAPI), nameof(DirectorAPI))]
 

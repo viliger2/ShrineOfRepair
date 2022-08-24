@@ -1,14 +1,11 @@
 ﻿using RoR2;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 
 namespace ShrineOfRepair.Modules
 {
     public class ModExtension
     {
-        // 
         public delegate void DictionaryFillDelegate(ref List<RepairableItems> list);
 
         public class RepairableItems

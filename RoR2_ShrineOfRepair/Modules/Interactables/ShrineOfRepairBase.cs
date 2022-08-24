@@ -14,6 +14,7 @@ namespace ShrineOfRepair.Modules.Interactables
         internal abstract GameObject CreateInteractable(GameObject InteractableModel);
 
         public static Dictionary<ItemIndex, ItemIndex> RepairItemsDictionary = new Dictionary<ItemIndex, ItemIndex>();
+
         public static Dictionary<EquipmentIndex, EquipmentIndex> RepairEquipmentsDictionary = new Dictionary<EquipmentIndex, EquipmentIndex>();
 
         public static void FillRepairItemsDictionary()
@@ -25,24 +26,27 @@ namespace ShrineOfRepair.Modules.Interactables
             foreach (var itemId in itemIds)
             {
                 var kv = itemId.Split('-');
-                ItemIndex broken = ItemCatalog.FindItemIndex(kv[0].Trim());
-                ItemIndex tofix = ItemCatalog.FindItemIndex(kv[1].Trim());
-                if (broken != ItemIndex.None && tofix != ItemIndex.None)
+                if (kv.Length == 2)
                 {
-                    RepairItemsDictionary.Add(broken, tofix);
-                    continue;
+                    ItemIndex broken = ItemCatalog.FindItemIndex(kv[0].Trim());
+                    ItemIndex tofix = ItemCatalog.FindItemIndex(kv[1].Trim());
+                    if (broken != ItemIndex.None && tofix != ItemIndex.None)
+                    {
+                        RepairItemsDictionary.Add(broken, tofix);
+                        continue;
+                    }
+                    EquipmentIndex broken2 = EquipmentCatalog.FindEquipmentIndex(kv[0].Trim());
+                    EquipmentIndex tofix2 = EquipmentCatalog.FindEquipmentIndex(kv[1].Trim());
+                    if (broken2 != EquipmentIndex.None && tofix2 != EquipmentIndex.None)
+                        RepairEquipmentsDictionary.Add(broken2, tofix2);
                 }
-                EquipmentIndex broken2 = EquipmentCatalog.FindEquipmentIndex(kv[0].Trim());
-                EquipmentIndex tofix2 = EquipmentCatalog.FindEquipmentIndex(kv[1].Trim());
-                if (broken2 != EquipmentIndex.None && tofix2 != EquipmentIndex.None)
-                    RepairEquipmentsDictionary.Add(broken2, tofix2);
             }
 
             RepairItemsDictionary = ModExtension.FillDictionaryFromMods(RepairItemsDictionary);
             ShrineOfRepairPlugin.MyLogger.LogDebug("Items");
-            foreach (var kv in RepairItemsDictionary) ShrineOfRepairPlugin.MyLogger.LogDebug(kv.Key + " -> " + kv.Value);
+            foreach (var kv in RepairItemsDictionary) ShrineOfRepairPlugin.MyLogger.LogDebug(ItemCatalog.GetItemDef(kv.Key).name + " -> " + ItemCatalog.GetItemDef(kv.Value).name);
             ShrineOfRepairPlugin.MyLogger.LogDebug("Equipments");
-            foreach (var kv in RepairEquipmentsDictionary) ShrineOfRepairPlugin.MyLogger.LogDebug(kv.Key + " -> " + kv.Value);
+            foreach (var kv in RepairEquipmentsDictionary) ShrineOfRepairPlugin.MyLogger.LogDebug(EquipmentCatalog.GetEquipmentDef(kv.Key).name + " -> " + EquipmentCatalog.GetEquipmentDef(kv.Value).name);
         }
 
         internal void CreateInteractables()

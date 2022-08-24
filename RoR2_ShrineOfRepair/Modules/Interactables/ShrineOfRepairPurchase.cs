@@ -153,7 +153,6 @@ namespace ShrineOfRepair.Modules.Interactables
                             }
                         }
                         if (RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex)) isShrineAvailable = true;
-                        MyLogger.LogInfo("Trying to interact: " + isShrineAvailable);
                         if (!isShrineAvailable) { return Interactability.ConditionsNotMet; }
                     }
                 }
@@ -216,11 +215,13 @@ namespace ShrineOfRepair.Modules.Interactables
                         {
                             inventory.RemoveItem(pairedItems.Key, numberOfItems);
                             inventory.GiveItem(pairedItems.Value, numberOfItems);
+                            CharacterMasterNotificationQueue.SendTransformNotification(body.master, pairedItems.Key, pairedItems.Value, CharacterMasterNotificationQueue.TransformationType.Default);
                         }
                     }
                     if (RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex))
                     {
                         inventory.SetEquipmentIndex(RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex]);
+                        CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, body.equipmentSlot.equipmentIndex, RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
                     }
 
                     EffectManager.SpawnEffect(Resources.Load<GameObject>("Prefabs/Effects/ShrineUseEffect"), new EffectData()

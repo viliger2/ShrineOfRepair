@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <Reference Include="BubbetsItems">
-      <HintPath>bin\Debug\netstandard2.0\BubbetsItems.dll</HintPath>
+      <HintPath>libs\BubbetsItems.dll</HintPath>
     </Reference>
   </ItemGroup>
 

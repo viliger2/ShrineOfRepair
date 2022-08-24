@@ -1,4 +1,6 @@
-﻿using R2API;
+﻿using BepInEx.Bootstrap;
+using BubbetsItems;
+using R2API;
 using RoR2;
 using RoR2.UI;
 using System.Collections.Generic;
@@ -9,14 +11,11 @@ using UnityEngine.Networking;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
-using BepInEx.Bootstrap;
-using BubbetsItems;
 
 namespace ShrineOfRepair.Modules.Interactables
 {
     public class ShrineOfRepairPicker : ShrineOfRepairBase<ShrineOfRepairPicker>
     {
-
         private static bool VoidLunarEnabled => Chainloader.PluginInfos.ContainsKey("bubbet.bubbetsitems");
 
         public override void Init()
@@ -176,14 +175,12 @@ namespace ShrineOfRepair.Modules.Interactables
 
                         PickupDef pickupDef = PickupCatalog.GetPickupDef(self.pickerController.options[index].pickupIndex);
                         FillRepairItemsDictionary();
-                        ItemIndex itemIndex;
-                        bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out itemIndex);
+                        bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex);
                         int count = master.inventory.GetItemCount(pickupDef.itemIndex);
                         ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
 
                         if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                         {
-
                             MyLogger.LogMessage(string.Format("Price for {0}x{1} is {2}", pickupDef.nameToken, count, isItem ? GetTotalStackCost(tier, count) : (uint)PickerPanelGoldEquipCost.Value));
 
                             GameObject textGameObject = new GameObject("CostText");
@@ -238,8 +235,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
                     // since broken items by default don't have tier
                     // we use our dictionary to get itemTier of non-broken item
-                    ItemIndex itemIndex;
-                    bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out itemIndex);
+                    bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex);
                     ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
 
                     if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
@@ -402,9 +398,10 @@ namespace ShrineOfRepair.Modules.Interactables
                 {
                     iconTransform.gameObject.SetActive(false);
                 }
-                if(pickupPickerController)
+                if (pickupPickerController)
                 {
-                    if (pickupPickerController.panelInstance) {
+                    if (pickupPickerController.panelInstance)
+                    {
                         Destroy(pickupPickerController.panelInstance);
                     }
                     // lets brute force it because fuck it, what could possibly go wrong
