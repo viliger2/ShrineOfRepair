@@ -86,7 +86,7 @@ namespace ShrineOfRepair.Modules.Interactables
             component.material.SetColor("_TintColor", color);
 
             // provides a manager than handles what happens when you interact with object
-            var shrineManager = InteractableModel.AddComponent<ShrineOfRepairPicker.ShrineRepairManager>();
+            var shrineManager = InteractableModel.AddComponent<ShrineRepairManager>();
             shrineManager.pickupPickerController = pickerController;
             shrineManager.iconTransform = icon;
 
@@ -145,6 +145,19 @@ namespace ShrineOfRepair.Modules.Interactables
                 }
                 return orig(self, activator);
             };
+
+            if (SpawnInBazaar.Value) On.RoR2.BazaarController.Awake += (orig, self) =>
+            {
+                orig(self);
+                spawnShrine(new Vector3(-82.7f, -25.1f, -62.9f), new Vector3(0f, 72.6f, 0f));
+            };
+
+            if (SpawnInMoon.Value) On.RoR2.Stage.Start += (orig, self) =>
+            {
+                orig(self);
+                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) spawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
+                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) spawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
+            };
         }
 
         public class ShrineRepairManager : NetworkBehaviour
@@ -154,10 +167,13 @@ namespace ShrineOfRepair.Modules.Interactables
 
             [SyncVar]
             public float coefficient;
+            private int uses;
+            private bool useLunarCoins;
 
             private Interactor interactor;
 
             private static int kRpcHandleInteractionClient;
+            private static int kRpcHandleDeactivateClient;
 
             public void Start()
             {
@@ -165,6 +181,9 @@ namespace ShrineOfRepair.Modules.Interactables
                 pickupPickerController.onServerInteractionBegin.AddListener(HandleInteraction);
 
                 coefficient = Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 1.25f);
+                uses = 0;
+                var scene = SceneCatalog.GetSceneDefForCurrentScene();
+                useLunarCoins = PickerUseLunarByDefault.Value || (scene == SceneCatalog.GetSceneDefFromSceneName("bazaar")) || (UseLunarInMoon.Value && (scene == SceneCatalog.GetSceneDefFromSceneName("moon") || scene == SceneCatalog.GetSceneDefFromSceneName("moon2")));
 
                 On.RoR2.UI.PickupPickerPanel.OnCreateButton += (orig, self, index, button) =>
                 {
@@ -181,7 +200,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
                         if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                         {
-                            MyLogger.LogMessage(string.Format("Price for {0}x{1} is {2}", pickupDef.nameToken, count, isItem ? GetTotalStackCost(tier, count) : (uint)PickerPanelGoldEquipCost.Value));
+                            MyLogger.LogMessage(string.Format("Price for {0}x{1} is {2}", pickupDef.nameToken, count, isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost()));
 
                             GameObject textGameObject = new GameObject("CostText");
                             textGameObject.transform.SetParent(button.transform);
@@ -193,9 +212,9 @@ namespace ShrineOfRepair.Modules.Interactables
                             counterText.enableWordWrapping = false;
                             counterText.alignment = TMPro.TextAlignmentOptions.Bottom;
                             counterText.fontSize = 20f;
-                            counterText.faceColor = Color.yellow;
+                            counterText.faceColor = useLunarCoins ? Color.white : Color.yellow;
                             counterText.outlineWidth = 0.2f;
-                            counterText.text = "$" + (isItem ? GetTotalStackCost(tier, count) : (uint)PickerPanelGoldEquipCost.Value);
+                            counterText.text = (useLunarCoins ? "<sprite name=\"LunarCoin\" tint=1>" : "$") + (isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost());
 
                             counterRect.localPosition = Vector3.zero;
                             counterRect.anchorMin = Vector2.zero;
@@ -240,10 +259,10 @@ namespace ShrineOfRepair.Modules.Interactables
 
                     if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                     {
-                        uint cost = isItem ? GetTotalStackCost(tier, numberOfItems) : (uint)PickerPanelGoldEquipCost.Value;
-                        if (cost > body.master.money)
+                        uint cost = isItem ? GetTotalStackCost(tier, numberOfItems) : GetEquipmentCost();
+                        if (cost > (useLunarCoins ? body.master.playerCharacterMasterController.networkUser.lunarCoins : body.master.money))
                         {
-                            MyLogger.LogWarning(string.Format("Somehow player {0} ({1}) has less money than price of {2}x{3}, yet it was available at the start of interaction. Doing nothing...", body.GetUserName(), body.name, pickupDef.nameToken, numberOfItems));
+                            MyLogger.LogWarning(string.Format("Somehow player {0} ({1}) has less currency than price of {2}x{3}, yet it was available at the start of interaction. Doing nothing...", body.GetUserName(), body.name, pickupDef.nameToken, numberOfItems));
                             return;
                         }
 
@@ -259,8 +278,9 @@ namespace ShrineOfRepair.Modules.Interactables
                             CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, pickupDef.equipmentIndex, RepairEquipmentsDictionary[pickupDef.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
                         }
 
-                        body.master.money -= cost;
-                        MyLogger.LogMessage(string.Format("Player {0} ({1}) paid {2} gold to repair {3}x{4}", body.GetUserName(), body.name, cost, pickupDef.nameToken, numberOfItems));
+                        if (useLunarCoins) body.master.playerCharacterMasterController.networkUser.DeductLunarCoins(cost);
+                        else body.master.money -= cost;
+                        MyLogger.LogMessage(string.Format("Player {0} ({1}) paid {2} {3} to repair {4}x{5}", body.GetUserName(), body.name, cost, useLunarCoins ? "lunar coins" : "money", pickupDef.nameToken, numberOfItems));
 
                         EffectManager.SpawnEffect(Resources.Load<GameObject>("Prefabs/Effects/ShrineUseEffect"), new EffectData()
                         {
@@ -270,8 +290,6 @@ namespace ShrineOfRepair.Modules.Interactables
                             color = (Color32)Color.red
                         }, true);
 
-                        iconTransform.gameObject.SetActive(false);
-
                         Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                         {
                             subjectAsCharacterBody = body,
@@ -280,7 +298,13 @@ namespace ShrineOfRepair.Modules.Interactables
 
                         Destroy(pickupPickerController.panelInstance);
 
-                        pickupPickerController.SetAvailable(false);
+                        uses++;
+                        if (uses == MaxUses.Value)
+                        {
+                            CallRpcHandleDeactivateClient();
+                            pickupPickerController.SetAvailable(false);
+                            iconTransform.gameObject.SetActive(false);
+                        }
                     }
                 }
             }
@@ -301,6 +325,8 @@ namespace ShrineOfRepair.Modules.Interactables
                 var charBody = interactor.GetComponent<CharacterBody>();
                 if (charBody && charBody.master)
                 {
+                    var currentCurrency = useLunarCoins ? charBody.master.playerCharacterMasterController.networkUser.lunarCoins : charBody.master.money;
+
                     FillRepairItemsDictionary();
                     foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in RepairItemsDictionary)
                     {
@@ -309,7 +335,7 @@ namespace ShrineOfRepair.Modules.Interactables
                         {
                             options.Add(new PickupPickerController.Option
                             {
-                                available = charBody.master.money > GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount),
+                                available = currentCurrency >= GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount),
                                 pickupIndex = PickupCatalog.FindPickupIndex(pairedItems.Key)
                             });
                         }
@@ -318,7 +344,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     {
                         options.Add(new PickupPickerController.Option
                         {
-                            available = charBody.master.money > PickerPanelGoldEquipCost.Value,
+                            available = currentCurrency >= GetEquipmentCost(),
                             pickupIndex = PickupCatalog.FindPickupIndex(charBody.equipmentSlot.equipmentIndex)
                         });
                     }
@@ -357,7 +383,16 @@ namespace ShrineOfRepair.Modules.Interactables
 
             private uint GetTotalStackCost(ItemTier tier, int numberOfItems)
             {
-                return (uint)(GetCostFromItemTier(tier) * numberOfItems * coefficient);
+                var res = (uint)(GetCostFromItemTier(tier) * numberOfItems * (useLunarCoins ? BazaarLunarMultiplier.Value : coefficient));
+                if (res <= 0) return 1;
+                return res;
+            }
+
+            private uint GetEquipmentCost()
+            {
+                var res = (uint)(PickerPanelGoldEquipCost.Value * (useLunarCoins ? BazaarLunarMultiplier.Value : coefficient));
+                if (res <= 0) return 1;
+                return res;
             }
 
             private void CallRpcHandleInteractionClient()
@@ -375,7 +410,25 @@ namespace ShrineOfRepair.Modules.Interactables
                 writer.Write((short)2);
                 writer.WritePackedUInt32((uint)kRpcHandleInteractionClient);
                 writer.Write(GetComponent<NetworkIdentity>().netId);
-                this.SendRPCInternal(writer, 0, "RpcHandleInteractionClient");
+                SendRPCInternal(writer, 0, "RpcHandleInteractionClient");
+            }
+
+            private void CallRpcHandleDeactivateClient()
+            {
+                if (!NetworkServer.active)
+                {
+                    MyLogger.LogWarning("RPC Function CallRpcHandleDeactivateClient called on client.");
+                    return;
+                }
+
+                MyLogger.LogMessage("RPC Function CallRpcHandleDeactivateClient, sending message to clients");
+
+                NetworkWriter writer = new NetworkWriter();
+                writer.Write((short)0);
+                writer.Write((short)2);
+                writer.WritePackedUInt32((uint)kRpcHandleDeactivateClient);
+                writer.Write(GetComponent<NetworkIdentity>().netId);
+                SendRPCInternal(writer, 0, "RpcHandleDeactivateClient");
             }
 
             protected static void InvokeRpcHandleInteractionClient(NetworkBehaviour obj, NetworkReader reader)
@@ -390,26 +443,35 @@ namespace ShrineOfRepair.Modules.Interactables
                 }
             }
 
+            protected static void InvokeRpcHandleDeactivateClient(NetworkBehaviour obj, NetworkReader reader)
+            {
+                if (!NetworkClient.active)
+                {
+                    MyLogger.LogWarning("RPC RpcHandleDeactivateClient called on server.");
+                }
+                else
+                {
+                    ((ShrineRepairManager)obj).RpcHandleDeactivateClient();
+                }
+            }
+
             [ClientRpc]
             public void RpcHandleInteactionClient()
             {
                 MyLogger.LogMessage("RPC RpcHandleInteactionClient message recieved");
-                if (iconTransform)
-                {
-                    iconTransform.gameObject.SetActive(false);
-                }
-                if (pickupPickerController)
-                {
-                    if (pickupPickerController.panelInstance)
-                    {
-                        Destroy(pickupPickerController.panelInstance);
-                    }
-                    // lets brute force it because fuck it, what could possibly go wrong
-                    // we cant use SetAvailable() because it's not allowed on clients
-                    // and I guess PickupPickerController doesn't sync it for some reason
-                    // unlike PurchaseInteraction
-                    pickupPickerController.available = false;
-                }
+                if (pickupPickerController && pickupPickerController.panelInstance) Destroy(pickupPickerController.panelInstance);
+            }
+
+            [ClientRpc]
+            public void RpcHandleDeactivateClient()
+            {
+                MyLogger.LogMessage("RPC RpcHandleDeactivateClient message recieved");
+                if (iconTransform) iconTransform.gameObject.SetActive(false);
+                // lets brute force it because fuck it, what could possibly go wrong
+                // we cant use SetAvailable() because it's not allowed on clients
+                // and I guess PickupPickerController doesn't sync it for some reason
+                // unlike PurchaseInteraction
+                if (pickupPickerController) pickupPickerController.available = false;
             }
 
             // RPC shamelessly stolen from MoreShrines by Evaisa
@@ -417,6 +479,8 @@ namespace ShrineOfRepair.Modules.Interactables
             {
                 kRpcHandleInteractionClient = 1268743049; // I guess that's id to separate messages by
                 RegisterRpcDelegate(typeof(ShrineRepairManager), kRpcHandleInteractionClient, InvokeRpcHandleInteractionClient);
+                kRpcHandleDeactivateClient = 1631732147; 
+                RegisterRpcDelegate(typeof(ShrineRepairManager), kRpcHandleDeactivateClient, InvokeRpcHandleDeactivateClient);
                 NetworkCRC.RegisterBehaviour("ShrineRepairManager", 0);
             }
         }

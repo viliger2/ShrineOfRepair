@@ -56,7 +56,7 @@ namespace ShrineOfRepair.Modules.Interactables
             genericNameDisplay.displayToken = $"INTERACTABLE_{InteractableLangToken}_NAME";
 
             // provides an interaction with object
-            var shrineManager = InteractableModel.AddComponent<ShrineOfRepairPurchase.RepairShrineManager>();
+            var shrineManager = InteractableModel.AddComponent<RepairShrineManager>();
             shrineManager.PurchaseInteraction = purchaseInteraction;
             shrineManager.ScalingModifier = PurchaseInteractionGoldScalingModifier.Value;
             shrineManager.UseDefaultScaling = PurchaseInteractionGoldUseDefaultScaling.Value;
@@ -110,11 +110,14 @@ namespace ShrineOfRepair.Modules.Interactables
             switch (currency)
             {
                 case CostTypes.LunarCoin:
+                    if (PurchaseInteractionLunarCoinCost.Value == 0) return CostTypeIndex.None;
                     return CostTypeIndex.LunarCoin;
                 case CostTypes.VoidCoin:
+                    if (PurchaseInteractionVoidCoinCost.Value == 0) return CostTypeIndex.None;
                     return CostTypeIndex.VoidCoin;
                 default:
                 case CostTypes.Gold:
+                    if (PurchaseInteractionGoldBaseCost.Value == 0) return CostTypeIndex.None;
                     return CostTypeIndex.Money;
             }
         }
@@ -158,6 +161,19 @@ namespace ShrineOfRepair.Modules.Interactables
                 }
                 return orig(self, activator);
             };
+
+            if (SpawnInBazaar.Value) On.RoR2.BazaarController.Awake += (orig, self) =>
+            {
+                orig(self);
+                spawnShrine(new Vector3(-82.7f, -25.1f, -62.9f), new Vector3(0f, 72.6f, 0f));
+            };
+
+            if (SpawnInMoon.Value) On.RoR2.Stage.Start += (orig, self) =>
+            {
+                orig(self);
+                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) spawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
+                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) spawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
+            };
         }
 
         public class RepairShrineManager : NetworkBehaviour
@@ -169,6 +185,8 @@ namespace ShrineOfRepair.Modules.Interactables
             [SyncVar]
             public int BaseCostDetermination;
 
+            public int uses;
+
             public void Start()
             {
                 if (NetworkServer.active && Run.instance)
@@ -177,13 +195,25 @@ namespace ShrineOfRepair.Modules.Interactables
                 }
 
                 PurchaseInteraction.onPurchase.AddListener(RepairPurchaseAttempt);
+                
                 if (PurchaseInteraction.costType == CostTypeIndex.Money)
                 {
-                    BaseCostDetermination = UseDefaultScaling
-                        ? (int)(PurchaseInteraction.cost * ScalingModifier)
-                        : (int)(Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, ScalingModifier) * PurchaseInteraction.cost);
+                    var scene = SceneCatalog.GetSceneDefForCurrentScene();
+                    if (scene == SceneCatalog.GetSceneDefFromSceneName("bazaar") || (UseLunarInMoon.Value && ((scene == SceneCatalog.GetSceneDefFromSceneName("moon")) || (scene == SceneCatalog.GetSceneDefFromSceneName("moon2")))))
+                    {
+                        PurchaseInteraction.costType = CostTypeIndex.LunarCoin;
+                        PurchaseInteraction.automaticallyScaleCostWithDifficulty = false;
+                        BaseCostDetermination = PurchaseInteractionLunarCoinCost.Value;
+                        PurchaseInteraction.cost = BaseCostDetermination;
+                    }
+                    else
+                    {
+                        BaseCostDetermination = UseDefaultScaling
+                            ? (int)(PurchaseInteraction.cost * ScalingModifier)
+                            : (int)(Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, ScalingModifier) * PurchaseInteraction.cost);
 
-                    PurchaseInteraction.cost = BaseCostDetermination;
+                        PurchaseInteraction.cost = BaseCostDetermination;
+                    }
                 }
                 else
                 {
@@ -191,6 +221,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     BaseCostDetermination = PurchaseInteraction.cost;
                     PurchaseInteraction.cost = BaseCostDetermination;
                 }
+                uses = 0;
             }
 
             [Server]
@@ -241,7 +272,8 @@ namespace ShrineOfRepair.Modules.Interactables
                         baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT"
                     });
 
-                    if (NetworkServer.active)
+                    uses++;
+                    if (NetworkServer.active && uses == MaxUses.Value)
                     {
                         PurchaseInteraction.SetAvailable(false);
                     }

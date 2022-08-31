@@ -2,9 +2,12 @@
 using R2API;
 using R2API.Networking;
 using R2API.Utils;
+using RoR2;
 using ShrineOfRepair.Modules.Interactables;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace ShrineOfRepair.Modules
 {
@@ -42,7 +45,6 @@ namespace ShrineOfRepair.Modules
 				interactable.Init();
 				MyLogger.LogInfo($"Interactable: {interactable.InteractableLangToken} loaded.");
             }
-        }
-
+		}
 	}
 }

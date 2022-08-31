@@ -17,6 +17,10 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<string> RepairList;
 
         public static ConfigEntry<bool> UsePickupPickerPanel;
+        public static ConfigEntry<bool> SpawnInBazaar;
+        public static ConfigEntry<bool> SpawnInMoon;
+        public static ConfigEntry<bool> UseLunarInMoon;
+        public static ConfigEntry<int> MaxUses;
 
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
@@ -37,6 +41,9 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<int> PickerPanelGoldLunarCost;
         public static ConfigEntry<int> PickerPanelGoldEquipCost;
 
+        public static ConfigEntry<float> BazaarLunarMultiplier;
+        public static ConfigEntry<bool> PickerUseLunarByDefault;
+
         public void Init(string configPath)
         {
             var mainConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-General.cfg"), true);
@@ -51,6 +58,11 @@ namespace ShrineOfRepair.Modules
                 "Main Repair List, by default filled with pairs of breakable-original vanilla items, can be used to create custom pairs of brokenItem - repairedItem, including those from mods. Syntax: (broken) - (new), delimiter: ','");
 
             UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
+
+            SpawnInBazaar = mainConfig.Bind("General", "Spawn Shrine in Bazaar", false, "Spawn the shrine in the Bazaar Between Time.");
+            SpawnInMoon = mainConfig.Bind("General", "Spawn Shrine in Moon", false, "Spawn the shrine in Commencement.");
+            MaxUses = mainConfig.Bind("General", "Max Uses", 1, "Amount of times a single shrine can repair before deactivating. Set to 0 for infinite.");
+            UseLunarInMoon = mainConfig.Bind("General", "Use Lunar Coins in Moon", false, "Make the Commencement shrine act like Bazaar shrine.");
 
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 
@@ -72,6 +84,9 @@ namespace ShrineOfRepair.Modules
             PickerPanelGoldBossCost = perItemConfig.Bind("Per Item Repairs", "Boss cost", 50, "Base cost of boss (yellow) item repair. By default the cost is equal to double tier 2 repair price.");
             PickerPanelGoldLunarCost = perItemConfig.Bind("Per Item Repairs", "Lunar cost", 25, "Base cost of lunar (blue) item repair. By default the cost is equal to the half of large chest price.");
             PickerPanelGoldEquipCost = perItemConfig.Bind("Per Item Repairs", "Equipment cost", 50, "Base cost of equipments (orange) repair. By default the cost is equal to double tier 2 repair price.");
+
+            BazaarLunarMultiplier = perItemConfig.Bind("Bazaar Shrines", "Bazaar Lunar Coin Multiplier", 0.04f, "Lunar Coin cost multiplier for Bazaar shrines. Disabled if currency type is not gold. 25 gold per 1 coin by default. set to 0 for free.");
+            PickerUseLunarByDefault = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins by Default", false, "Set to true to make every shrine act like Bazaar's shrines.");
         }
 
     }
