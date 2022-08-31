@@ -43,6 +43,10 @@ namespace ShrineOfRepair.Modules
 
         public static ConfigEntry<float> BazaarLunarMultiplier;
         public static ConfigEntry<bool> PickerUseLunarByDefault;
+        public static ConfigEntry<bool> PickerDisplayStack;
+        public static ConfigEntry<bool> PickerShowX;
+        public static ConfigEntry<bool> PickerShowOne;
+        public static ConfigEntry<bool> PickerShowFree;
 
         public void Init(string configPath)
         {
@@ -87,6 +91,11 @@ namespace ShrineOfRepair.Modules
 
             BazaarLunarMultiplier = perItemConfig.Bind("Bazaar Shrines", "Bazaar Lunar Coin Multiplier", 0.04f, "Lunar Coin cost multiplier for Bazaar shrines. Disabled if currency type is not gold. 25 gold per 1 coin by default. set to 0 for free.");
             PickerUseLunarByDefault = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins by Default", false, "Set to true to make every shrine act like Bazaar's shrines.");
+            PickerDisplayStack = perItemConfig.Bind("Display", "Display Item Stack", false, "Set to true to display how much of each item you have, similar to various QoL show scrapper stack mods.");
+            PickerShowX = perItemConfig.Bind("Display", "Display X", true, "Set to true to display x2 instead of 2.");
+            PickerShowOne = perItemConfig.Bind("Display", "Display For One Stack", false, "Set to true to display stack number for a single stack.");
+
+            PickerShowFree = perItemConfig.Bind("Display", "Display Cost for Free", false, "Set to true to display $0 for free entries.");
         }
 
     }

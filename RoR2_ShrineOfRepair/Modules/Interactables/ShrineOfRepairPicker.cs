@@ -202,14 +202,14 @@ namespace ShrineOfRepair.Modules.Interactables
                         {
                             MyLogger.LogMessage(string.Format("Price for {0}x{1} is {2}", pickupDef.nameToken, count, isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost()));
 
-                            GameObject textGameObject = new GameObject("CostText");
-                            textGameObject.transform.SetParent(button.transform);
-                            textGameObject.layer = 5;
-
-                            RectTransform counterRect = textGameObject.AddComponent<RectTransform>();
-
-                            if ((isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost()) != 0)
+                            if (PickerShowFree.Value || ((isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost()) != 0))
                             {
+                                GameObject textGameObject = new GameObject("CostText");
+                                textGameObject.transform.SetParent(button.transform);
+                                textGameObject.layer = 5;
+
+                                RectTransform counterRect = textGameObject.AddComponent<RectTransform>();
+
                                 HGTextMeshProUGUI counterText = textGameObject.AddComponent<HGTextMeshProUGUI>();
                                 counterText.enableWordWrapping = false;
                                 counterText.alignment = TMPro.TextAlignmentOptions.Bottom;
@@ -224,6 +224,29 @@ namespace ShrineOfRepair.Modules.Interactables
                                 counterRect.localScale = Vector3.one;
                                 counterRect.sizeDelta = new Vector2(-10, -4);
                                 counterRect.anchoredPosition = Vector2.zero;
+                            }
+
+                            if (isItem && PickerDisplayStack.Value && (PickerShowOne.Value || count > 1))
+                            {
+                                GameObject textGameObject = new GameObject("StackText");
+                                textGameObject.transform.SetParent(button.transform);
+                                textGameObject.layer = 5;
+
+                                RectTransform stackerRect = textGameObject.AddComponent<RectTransform>();
+
+                                HGTextMeshProUGUI stackerText = textGameObject.AddComponent<HGTextMeshProUGUI>();
+                                stackerText.enableWordWrapping = false;
+                                stackerText.alignment = TMPro.TextAlignmentOptions.TopRight;
+                                stackerText.fontSize = 18f;
+                                stackerText.faceColor = Color.white;
+                                stackerText.text = (PickerShowX.Value ? "x" : "") + count;
+
+                                stackerRect.localPosition = Vector3.zero;
+                                stackerRect.anchorMin = Vector2.zero;
+                                stackerRect.anchorMax = Vector2.one;
+                                stackerRect.localScale = Vector3.one;
+                                stackerRect.sizeDelta = new Vector2(-10, -3);
+                                stackerRect.anchoredPosition = Vector2.zero;
                             }
                         }
                     }

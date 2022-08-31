@@ -45,6 +45,7 @@ majority of 1.2.1 ~ 1.2.2 changes - prodzpod
 	* Added Config to spawn the shrine in Bazaar Between Time and Commencement.
 	* Implemented Lunar Coins for Scrapper UI.
 	* Added Korean Support.
+	* Added Stack Indicator (configurable).
 * 1.2.1 
 	* Added Repair List (replaces Blacklist), Equipment Repair, Boss/Lunar/Equipment Cost Config and Void Lunar compat (from [BubbetsItems](https://thunderstore.io/package/Bubbet/BubbetsItems/)). 
 	* Added Regenerating Scrap and Trophy Hunter's Tricorn by default.
