@@ -2,23 +2,29 @@
 	"strings": {
 		"INTERACTABLE_SHRINE_REPAIR_NAME": "Shrine of Repair",
 		"INTERACTABLE_SHRINE_REPAIR_CONTEXT": "Repair items?",
-		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">You repaired {0}{1}.</style>",
-		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cEvent\">{0} repaired {1}{2}.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">You repaired items.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\">{0} repaired items.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER_2P": "<style=\"cShrine\">You repaired</style> {1}{2}",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER": "<style=\"cShrine\">{0} repaired</style> {1}{2}",
 		"INTERACTABLE_SHRINE_REPAIR_PICKERPANEL_HEADER": "<b>Shrine of Repair</b><br><i><style=\"cSub\"><size=75%>Fixing smart design decisions for half the price!</size></style></i>",
 		"ITEM_HEALINGPOTIONCONSUMED_DESC": "Imagine being Hopoo and not implementing descriptions for base game items."
 	},
 	"RU": {
 		"INTERACTABLE_SHRINE_REPAIR_NAME": "Святилище Починки",
 		"INTERACTABLE_SHRINE_REPAIR_CONTEXT": "Починить предметы?",
-		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">Вы починили {0}{1}.</style>",
-		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cEvent\">{0} починил {1}{2}.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">Вы починили предметы.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\">{0} починил предметы.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER_2P": "<style=\"cShrine\">Вы починили</style> {1}{2}",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER": "<style=\"cShrine\">{0} починил</style> {1}{2}",
 		"INTERACTABLE_SHRINE_REPAIR_PICKERPANEL_HEADER": "<b>Святилище Починки</b><br><i><style=\"cSub\"><size=75%>Исправляем дизайнерские решения за пол цены!</size></style></i>"
 	},
 	"ko": {
 		"INTERACTABLE_SHRINE_REPAIR_NAME": "수리의 성소",
 		"INTERACTABLE_SHRINE_REPAIR_CONTEXT": "아이템 수리하기",
-		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">수리: {0}{1}.</style>",
-		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cEvent\">{0} 님이 수리: {1}{2}.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">아이템을 수리했습니다.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\">{0} 님이 아이템을 수리했습니다.</style>",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER_2P": "<style=\"cShrine\">수리:</style> {1}{2}",
+		"INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER": "<style=\"cShrine\">{0} 님이 수리:</style> {1}{2}",
 		"INTERACTABLE_SHRINE_REPAIR_PICKERPANEL_HEADER": "<b>수리의 성소</b><br><i><style=\"cSub\"><size=75%>똑똑한 발명품을 반값에 고친다!</size></style></i>"
 	}
 }

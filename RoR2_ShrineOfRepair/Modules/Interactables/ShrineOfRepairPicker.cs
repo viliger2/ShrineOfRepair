@@ -208,20 +208,23 @@ namespace ShrineOfRepair.Modules.Interactables
 
                             RectTransform counterRect = textGameObject.AddComponent<RectTransform>();
 
-                            HGTextMeshProUGUI counterText = textGameObject.AddComponent<HGTextMeshProUGUI>();
-                            counterText.enableWordWrapping = false;
-                            counterText.alignment = TMPro.TextAlignmentOptions.Bottom;
-                            counterText.fontSize = 20f;
-                            counterText.faceColor = useLunarCoins ? Color.white : Color.yellow;
-                            counterText.outlineWidth = 0.2f;
-                            counterText.text = (useLunarCoins ? "<sprite name=\"LunarCoin\" tint=1>" : "$") + (isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost());
+                            if ((isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost()) != 0)
+                            {
+                                HGTextMeshProUGUI counterText = textGameObject.AddComponent<HGTextMeshProUGUI>();
+                                counterText.enableWordWrapping = false;
+                                counterText.alignment = TMPro.TextAlignmentOptions.Bottom;
+                                counterText.fontSize = 20f;
+                                counterText.faceColor = useLunarCoins ? Color.white : Color.yellow;
+                                counterText.outlineWidth = 0.2f;
+                                counterText.text = (useLunarCoins ? "<sprite name=\"LunarCoin\" tint=1>" : "$") + (isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost());
 
-                            counterRect.localPosition = Vector3.zero;
-                            counterRect.anchorMin = Vector2.zero;
-                            counterRect.anchorMax = Vector2.one;
-                            counterRect.localScale = Vector3.one;
-                            counterRect.sizeDelta = new Vector2(-10, -4);
-                            counterRect.anchoredPosition = Vector2.zero;
+                                counterRect.localPosition = Vector3.zero;
+                                counterRect.anchorMin = Vector2.zero;
+                                counterRect.anchorMax = Vector2.one;
+                                counterRect.localScale = Vector3.one;
+                                counterRect.sizeDelta = new Vector2(-10, -4);
+                                counterRect.anchoredPosition = Vector2.zero;
+                            }
                         }
                     }
                 };
@@ -266,16 +269,25 @@ namespace ShrineOfRepair.Modules.Interactables
                             return;
                         }
 
+                        string pickupColorHex, pickupName, pickupAmountString;
                         if (isItem)
                         {
                             body.inventory.RemoveItem(pickupDef.itemIndex, numberOfItems);
                             body.inventory.GiveItem(itemIndex, numberOfItems);
                             CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+
+                            pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
+                            pickupName = Language.GetString(ItemCatalog.GetItemDef(itemIndex).nameToken);
+                            pickupAmountString = (numberOfItems == 1) ? "" : ("<style=\"cEvent\">(" + numberOfItems + ")</style>");
                         }
                         else
                         {
                             body.inventory.SetEquipmentIndex(RepairEquipmentsDictionary[pickupDef.equipmentIndex]);
                             CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, pickupDef.equipmentIndex, RepairEquipmentsDictionary[pickupDef.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
+
+                            pickupColorHex = ColorCatalog.GetColorHexString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).colorIndex);
+                            pickupName = Language.GetString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).nameToken);
+                            pickupAmountString = "";
                         }
 
                         if (useLunarCoins) body.master.playerCharacterMasterController.networkUser.DeductLunarCoins(cost);
@@ -293,7 +305,8 @@ namespace ShrineOfRepair.Modules.Interactables
                         Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                         {
                             subjectAsCharacterBody = body,
-                            baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT"
+                            baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER",
+                            paramTokens = new string[] {"<color=#" + pickupColorHex + ">" + pickupName + "</color>", pickupAmountString}
                         });
 
                         Destroy(pickupPickerController.panelInstance);
@@ -383,6 +396,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
             private uint GetTotalStackCost(ItemTier tier, int numberOfItems)
             {
+                if (GetCostFromItemTier(tier) <= 0) return 0;
                 var res = (uint)(GetCostFromItemTier(tier) * numberOfItems * (useLunarCoins ? BazaarLunarMultiplier.Value : coefficient));
                 if (res <= 0) return 1;
                 return res;
@@ -390,6 +404,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
             private uint GetEquipmentCost()
             {
+                if (PickerPanelGoldEquipCost.Value <= 0) return 0;
                 var res = (uint)(PickerPanelGoldEquipCost.Value * (useLunarCoins ? BazaarLunarMultiplier.Value : coefficient));
                 if (res <= 0) return 1;
                 return res;
