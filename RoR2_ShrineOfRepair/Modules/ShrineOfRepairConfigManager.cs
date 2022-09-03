@@ -61,7 +61,7 @@ namespace ShrineOfRepair.Modules
             UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
 
             SpawnInBazaar = mainConfig.Bind("General", "Spawn Shrine in Bazaar", false, "Spawn the shrine in the Bazaar Between Time.");
-            SpawnInMoon = mainConfig.Bind("General", "Spawn Shrine in Moon", false, "Spawn the shrine in Commencement.");
+            SpawnInMoon = mainConfig.Bind("General", "Spawn Shrine in Moon", true, "Spawn the shrine in Commencement.");
             MaxUses = mainConfig.Bind("General", "Max Uses", 1, "Amount of times a single shrine can repair before deactivating. Set to 0 for infinite.");
             UseLunarInMoon = mainConfig.Bind("General", "Use Lunar Coins in Moon", false, "Make the Commencement shrine act like Bazaar shrine.");
 
