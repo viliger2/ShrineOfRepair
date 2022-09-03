@@ -13,6 +13,10 @@ Blacklist is now replaced with Repair List, a list that allows users to create t
 
 Pre-1.2.0 behavior can be enabled in General config.
 
+Shrine can be spawned in the Bazaar in Time and Commencement via config, and price will be converted to Lunar Coins (rate and commencement currency configurable)
+
+![Shrine Position](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/screenshot2.jpg)
+
 ## Pre 1.2.0 version
 Risk of Rain 2 mod, adds a shrine to repair broken items. Features custom price scaling, to account for number of broken items you **might** have in your inventory, so the shrine is cheaper than a single chest early on and gets sharper price increase in the late game compared to the rest of interactable. Everything is customizable (base price, director costs and weights, which formula to use, etc.)
 Custom scaling formula is
@@ -33,9 +37,15 @@ Config also usage of different currencies. Currencies can be:
 programming, billboard icon, bad model - me  
 good model, texturing - Extrabee  
 help with testing and RoR2 disassembling - vox  
-majority of 1.2.1 changes - prodzpod  
+majority of 1.2.1 ~ 1.2.2 changes - prodzpod  
 
 ## Version history
+* 1.2.2
+    * Added Max Uses Config.
+	* Added Config to spawn the shrine in Bazaar Between Time and Commencement.
+	* Implemented Lunar Coins for Scrapper UI.
+	* Added Korean Support.
+	* Added Stack Indicator (configurable).
 * 1.2.1 
 	* Added Repair List (replaces Blacklist), Equipment Repair, Boss/Lunar/Equipment Cost Config and Void Lunar compat (from [BubbetsItems](https://thunderstore.io/package/Bubbet/BubbetsItems/)). 
 	* Added Regenerating Scrap and Trophy Hunter's Tricorn by default.

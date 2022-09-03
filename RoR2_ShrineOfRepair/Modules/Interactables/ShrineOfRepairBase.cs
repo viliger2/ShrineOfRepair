@@ -2,6 +2,7 @@
 using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 
@@ -16,6 +17,8 @@ namespace ShrineOfRepair.Modules.Interactables
         public static Dictionary<ItemIndex, ItemIndex> RepairItemsDictionary = new Dictionary<ItemIndex, ItemIndex>();
 
         public static Dictionary<EquipmentIndex, EquipmentIndex> RepairEquipmentsDictionary = new Dictionary<EquipmentIndex, EquipmentIndex>();
+
+        public static InteractableSpawnCard shrineSpawnCard;
 
         public static void FillRepairItemsDictionary()
         {
@@ -55,12 +58,12 @@ namespace ShrineOfRepair.Modules.Interactables
             var sandyModel = CreateInteractable(UseBadModel.Value ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab") : MainBundle.LoadAsset<GameObject>("ShrineRepairGood_sandy.prefab"));
             var snowyModel = CreateInteractable(UseBadModel.Value ? MainBundle.LoadAsset<GameObject>("ShrineRepair.prefab") : MainBundle.LoadAsset<GameObject>("ShrineRepairGood_snowy.prefab"));
 
-            CreateInteractableSpawnCard(normalModel, "iscShrineRepair", GetNormalStageList());
+            shrineSpawnCard = CreateInteractableSpawnCard(normalModel, "iscShrineRepair", GetNormalStageList());
             CreateInteractableSpawnCard(sandyModel, "iscShrineRepairSandy", GetSandyStageList());
             CreateInteractableSpawnCard(snowyModel, "iscShrineRepairSnowy", GetSnowyStageList());
         }
 
-        private void CreateInteractableSpawnCard(GameObject InteractableModel, string name, List<DirectorAPI.Stage> stageList)
+        private InteractableSpawnCard CreateInteractableSpawnCard(GameObject InteractableModel, string name, List<DirectorAPI.Stage> stageList)
         {
             InteractableSpawnCard interactableSpawnCard = ScriptableObject.CreateInstance<InteractableSpawnCard>();
             interactableSpawnCard.name = name;
@@ -86,6 +89,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 DirectorAPI.Helpers.AddNewInteractableToStage(directorCard, DirectorCategory.Value, stage);
             }
 
+            return interactableSpawnCard;
         }
 
         private List<DirectorAPI.Stage> GetNormalStageList()
@@ -134,6 +138,16 @@ namespace ShrineOfRepair.Modules.Interactables
 
             return stageList;
 
+        }
+
+        protected void spawnShrine(Vector3 position, Vector3 angle)
+        {
+            if (!NetworkServer.active) return;
+            DirectorPlacementRule directorPlacementRule = new DirectorPlacementRule();
+            directorPlacementRule.placementMode = 0;
+            GameObject spawnedInstance = shrineSpawnCard.DoSpawn(position, Quaternion.identity, new DirectorSpawnRequest(shrineSpawnCard, directorPlacementRule, Run.instance.runRNG)).spawnedInstance;
+            spawnedInstance.transform.eulerAngles = angle;
+            NetworkServer.Spawn(spawnedInstance);
         }
 
     }
