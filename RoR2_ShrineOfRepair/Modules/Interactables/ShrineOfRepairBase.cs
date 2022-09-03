@@ -140,7 +140,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
         }
 
-        protected void spawnShrine(Vector3 position, Vector3 angle)
+        protected void SpawnShrine(Vector3 position, Vector3 angle)
         {
             if (!NetworkServer.active) return;
             DirectorPlacementRule directorPlacementRule = new DirectorPlacementRule();
@@ -150,5 +150,20 @@ namespace ShrineOfRepair.Modules.Interactables
             NetworkServer.Spawn(spawnedInstance);
         }
 
+        protected virtual void Hooks()
+        {
+            if (SpawnInBazaar.Value) On.RoR2.BazaarController.Awake += (orig, self) =>
+            {
+                orig(self);
+                SpawnShrine(new Vector3(-82.7f, -25.1f, -62.9f), new Vector3(0f, 72.6f, 0f));
+            };
+
+            if (SpawnInMoon.Value) On.RoR2.Stage.Start += (orig, self) =>
+            {
+                orig(self);
+                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
+                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
+            };
+        }
     }
 }

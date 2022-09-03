@@ -16,8 +16,6 @@ namespace ShrineOfRepair.Modules.Interactables
 {
     public class ShrineOfRepairPicker : ShrineOfRepairBase<ShrineOfRepairPicker>
     {
-        private static bool VoidLunarEnabled => Chainloader.PluginInfos.ContainsKey("bubbet.bubbetsitems");
-
         public override void Init()
         {
             if (UsePickupPickerPanel.Value)
@@ -95,8 +93,9 @@ namespace ShrineOfRepair.Modules.Interactables
             return InteractableModel;
         }
 
-        private void Hooks()
+        protected override void Hooks()
         {
+            base.Hooks();
             On.RoR2.UI.PickupPickerPanel.Awake += (orig, self) =>
             {
                 orig(self);
@@ -123,7 +122,6 @@ namespace ShrineOfRepair.Modules.Interactables
                     }
                 }
             };
-
             On.RoR2.PickupPickerController.GetInteractability += (orig, self, activator) =>
             {
                 if (self.name.Contains("ShrineRepair") && activator)
@@ -144,19 +142,6 @@ namespace ShrineOfRepair.Modules.Interactables
                     }
                 }
                 return orig(self, activator);
-            };
-
-            if (SpawnInBazaar.Value) On.RoR2.BazaarController.Awake += (orig, self) =>
-            {
-                orig(self);
-                spawnShrine(new Vector3(-82.7f, -25.1f, -62.9f), new Vector3(0f, 72.6f, 0f));
-            };
-
-            if (SpawnInMoon.Value) On.RoR2.Stage.Start += (orig, self) =>
-            {
-                orig(self);
-                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) spawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
-                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) spawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
             };
         }
 
@@ -226,28 +211,28 @@ namespace ShrineOfRepair.Modules.Interactables
                                 counterRect.anchoredPosition = Vector2.zero;
                             }
 
-                            if (isItem && PickerDisplayStack.Value && (PickerShowOne.Value || count > 1))
-                            {
-                                GameObject textGameObject = new GameObject("StackText");
-                                textGameObject.transform.SetParent(button.transform);
-                                textGameObject.layer = 5;
+                            //if (isItem && PickerDisplayStack.Value && (PickerShowOne.Value || count > 1))
+                            //{
+                            //    GameObject textGameObject = new GameObject("StackText");
+                            //    textGameObject.transform.SetParent(button.transform);
+                            //    textGameObject.layer = 5;
 
-                                RectTransform stackerRect = textGameObject.AddComponent<RectTransform>();
+                            //    RectTransform stackerRect = textGameObject.AddComponent<RectTransform>();
 
-                                HGTextMeshProUGUI stackerText = textGameObject.AddComponent<HGTextMeshProUGUI>();
-                                stackerText.enableWordWrapping = false;
-                                stackerText.alignment = TMPro.TextAlignmentOptions.TopRight;
-                                stackerText.fontSize = 18f;
-                                stackerText.faceColor = Color.white;
-                                stackerText.text = (PickerShowX.Value ? "x" : "") + count;
+                            //    HGTextMeshProUGUI stackerText = textGameObject.AddComponent<HGTextMeshProUGUI>();
+                            //    stackerText.enableWordWrapping = false;
+                            //    stackerText.alignment = TMPro.TextAlignmentOptions.TopRight;
+                            //    stackerText.fontSize = 18f;
+                            //    stackerText.faceColor = Color.white;
+                            //    stackerText.text = (PickerShowX.Value ? "x" : "") + count;
 
-                                stackerRect.localPosition = Vector3.zero;
-                                stackerRect.anchorMin = Vector2.zero;
-                                stackerRect.anchorMax = Vector2.one;
-                                stackerRect.localScale = Vector3.one;
-                                stackerRect.sizeDelta = new Vector2(-10, -3);
-                                stackerRect.anchoredPosition = Vector2.zero;
-                            }
+                            //    stackerRect.localPosition = Vector3.zero;
+                            //    stackerRect.anchorMin = Vector2.zero;
+                            //    stackerRect.anchorMax = Vector2.one;
+                            //    stackerRect.localScale = Vector3.one;
+                            //    stackerRect.sizeDelta = new Vector2(-10, -3);
+                            //    stackerRect.anchoredPosition = Vector2.zero;
+                            //}
                         }
                     }
                 };
@@ -391,7 +376,7 @@ namespace ShrineOfRepair.Modules.Interactables
 
             private int GetCostFromItemTier(ItemTier tier)
             {
-                if (VoidLunarEnabled && isVoidLunar(tier)) return PickerPanelGoldLunarCost.Value;
+                if (BubbetItemsCompat.enabled && BubbetItemsCompat.IsVoidLunar(tier)) return PickerPanelGoldLunarCost.Value;
                 switch (tier)
                 {
                     case ItemTier.Tier1:
@@ -410,11 +395,6 @@ namespace ShrineOfRepair.Modules.Interactables
                     case ItemTier.Lunar:
                         return PickerPanelGoldLunarCost.Value;
                 }
-            }
-
-            private bool isVoidLunar(ItemTier tier)
-            {
-                return tier == BubbetsItemsPlugin.VoidLunarTier.tier;
             }
 
             private uint GetTotalStackCost(ItemTier tier, int numberOfItems)
