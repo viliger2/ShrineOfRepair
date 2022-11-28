@@ -40,6 +40,9 @@ help with testing and RoR2 disassembling - vox
 majority of 1.2.1 ~ 1.2.2 changes - prodzpod  
 
 ## Version history
+* 1.2.3
+	* Moved shrine in Bazaar so it doesn't collide with things spawned by BiggerBazaar
+	* Moved coordinates and angles of all static spawns (bazaar, moon and moon2) into config
 * 1.2.2
     * Added Max Uses Config.
 	* Added Config to spawn the shrine in Bazaar Between Time and Commencement.
