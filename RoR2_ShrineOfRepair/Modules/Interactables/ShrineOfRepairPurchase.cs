@@ -183,7 +183,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 }
 
                 PurchaseInteraction.onPurchase.AddListener(RepairPurchaseAttempt);
-                
+
                 if (PurchaseInteraction.costType == CostTypeIndex.Money)
                 {
                     var scene = SceneCatalog.GetSceneDefForCurrentScene();

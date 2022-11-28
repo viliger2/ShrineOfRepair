@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using R2API;
 using System.IO;
+using UnityEngine;
 using static ShrineOfRepair.Modules.Interactables.ShrineOfRepairPurchase;
 
 namespace ShrineOfRepair.Modules
@@ -21,6 +22,15 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<bool> SpawnInMoon;
         public static ConfigEntry<bool> UseLunarInMoon;
         public static ConfigEntry<int> MaxUses;
+
+        public static ConfigEntry<Vector3> BazaarPosition;
+        public static ConfigEntry<Vector3> BazaarAngle;
+
+        public static ConfigEntry<Vector3> MoonPosition;
+        public static ConfigEntry<Vector3> MoonAngle;
+
+        public static ConfigEntry<Vector3> Moon2Position;
+        public static ConfigEntry<Vector3> Moon2Angle;
 
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
@@ -55,15 +65,25 @@ namespace ShrineOfRepair.Modules
             DirectorWeight = mainConfig.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
             DirectorCategory = mainConfig.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
 
-            RepairList = mainConfig.Bind("RepairList", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter", 
+            RepairList = mainConfig.Bind("RepairList", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter",
                 "Main Repair List, by default filled with pairs of breakable-original vanilla items, can be used to create custom pairs of brokenItem - repairedItem, including those from mods. Syntax: (broken) - (new), delimiter: ','");
 
             UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
 
-            SpawnInBazaar = mainConfig.Bind("General", "Spawn Shrine in Bazaar", false, "Spawn the shrine in the Bazaar Between Time.");
-            SpawnInMoon = mainConfig.Bind("General", "Spawn Shrine in Moon", true, "Spawn the shrine in Commencement.");
+
             MaxUses = mainConfig.Bind("General", "Max Uses", 1, "Amount of times a single shrine can repair before deactivating. Set to 0 for infinite.");
             UseLunarInMoon = mainConfig.Bind("General", "Use Lunar Coins in Moon", false, "Make the Commencement shrine act like Bazaar shrine.");
+
+            SpawnInBazaar = mainConfig.Bind("Bazaar", "Spawn Shrine in Bazaar", false, "Spawn the shrine in the Bazaar Between Time.");
+            BazaarPosition = mainConfig.Bind("Bazaar", "Shrine Position in Bazaar", new Vector3(-139.5f, -25.5f, -19.9f), "Position of the shrine in the Bazaar Between Time");
+            BazaarAngle = mainConfig.Bind("Bazaar", "Shrine Angle in Bazaar", new Vector3(0f, 0f, 0f), "Angle (rotation) of the shrine in the Bazaar Between Time");
+
+            SpawnInMoon = mainConfig.Bind("Commencement", "Spawn Shrine in Moon", true, "Spawn the shrine in Commencement.");
+            MoonPosition = mainConfig.Bind("Commencement", "Shrine Position in Commencement (pre-Aniversary)", new Vector3(749.4f, 253f, -244.3f), "Position of the shrine in Commencement (pre-Aniversary)");
+            MoonAngle = mainConfig.Bind("Commencement", "Shrine Angle in Commencement (pre-Aniversary)", new Vector3(0f, 143.2f, 0f), "Angle (rotation) of the shrine in Commencement (pre-Aniversary)");
+
+            Moon2Position = mainConfig.Bind("Commencement", "Shrine Position in Commencement", new Vector3(-3.9f, -150.6f, -331.2f), "Position of the shrine in Commencement");
+            Moon2Angle = mainConfig.Bind("Commencement", "Shrine Angle in Commencement", new Vector3(-70f, 164f, 0f), "Angle (rotation) of the shrine in Commencement");
 
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 

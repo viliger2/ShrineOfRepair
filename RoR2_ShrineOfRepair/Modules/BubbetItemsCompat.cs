@@ -11,7 +11,7 @@ namespace ShrineOfRepair.Modules
         {
             get
             {
-                if(_enabled == null)
+                if (_enabled == null)
                 {
                     _enabled = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("bubbet.bubbetsitems");
                 }

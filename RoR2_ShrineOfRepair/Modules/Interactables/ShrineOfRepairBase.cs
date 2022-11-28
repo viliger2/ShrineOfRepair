@@ -155,14 +155,17 @@ namespace ShrineOfRepair.Modules.Interactables
             if (SpawnInBazaar.Value) On.RoR2.BazaarController.Awake += (orig, self) =>
             {
                 orig(self);
-                SpawnShrine(new Vector3(-82.7f, -25.1f, -62.9f), new Vector3(0f, 72.6f, 0f));
+                //SpawnShrine(new Vector3(-139.5f, -25.5f, -19.9f), new Vector3(0f, 0f, 0f));
+                SpawnShrine(BazaarPosition.Value, BazaarAngle.Value);
             };
 
             if (SpawnInMoon.Value) On.RoR2.Stage.Start += (orig, self) =>
             {
                 orig(self);
-                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
-                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
+                //if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
+                //else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
+                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(MoonPosition.Value, MoonAngle.Value);
+                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(Moon2Position.Value, Moon2Angle.Value);
             };
         }
     }

@@ -314,7 +314,7 @@ namespace ShrineOfRepair.Modules.Interactables
                         {
                             subjectAsCharacterBody = body,
                             baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER",
-                            paramTokens = new string[] {"<color=#" + pickupColorHex + ">" + pickupName + "</color>", pickupAmountString}
+                            paramTokens = new string[] { "<color=#" + pickupColorHex + ">" + pickupName + "</color>", pickupAmountString }
                         });
 
                         Destroy(pickupPickerController.panelInstance);
@@ -497,7 +497,7 @@ namespace ShrineOfRepair.Modules.Interactables
             {
                 kRpcHandleInteractionClient = 1268743049; // I guess that's id to separate messages by
                 RegisterRpcDelegate(typeof(ShrineRepairManager), kRpcHandleInteractionClient, InvokeRpcHandleInteractionClient);
-                kRpcHandleDeactivateClient = 1631732147; 
+                kRpcHandleDeactivateClient = 1631732147;
                 RegisterRpcDelegate(typeof(ShrineRepairManager), kRpcHandleDeactivateClient, InvokeRpcHandleDeactivateClient);
                 NetworkCRC.RegisterBehaviour("ShrineRepairManager", 0);
             }
