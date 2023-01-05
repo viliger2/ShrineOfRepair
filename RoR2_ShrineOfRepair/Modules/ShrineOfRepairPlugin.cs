@@ -1,7 +1,5 @@
 ﻿using BepInEx;
 using R2API;
-using R2API.Networking;
-using R2API.Utils;
 using ShrineOfRepair.Modules.Interactables;
 using System.Linq;
 using System.Reflection;
@@ -9,9 +7,9 @@ using System.Reflection;
 namespace ShrineOfRepair.Modules
 {
     [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.2.3")]
-    [BepInDependency(R2API.R2API.PluginGUID)]
-    [R2APISubmoduleDependency(nameof(LanguageAPI), nameof(PrefabAPI), nameof(NetworkingAPI), nameof(DirectorAPI))]
-
+    [BepInDependency(LanguageAPI.PluginGUID)]
+    [BepInDependency(PrefabAPI.PluginGUID)]
+    [BepInDependency(DirectorAPI.PluginGUID)]
     [BepInDependency("bubbet.bubbetsitems", BepInDependency.DependencyFlags.SoftDependency)]
 
     public class ShrineOfRepairPlugin : BaseUnityPlugin

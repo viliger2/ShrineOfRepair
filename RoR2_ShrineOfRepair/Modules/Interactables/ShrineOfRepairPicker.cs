@@ -1,6 +1,4 @@
-﻿using BepInEx.Bootstrap;
-using BubbetsItems;
-using R2API;
+﻿using R2API;
 using RoR2;
 using RoR2.UI;
 using System.Collections.Generic;
