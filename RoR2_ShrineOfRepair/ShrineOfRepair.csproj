@@ -23,22 +23,16 @@
     <Reference Include="BubbetsItems">
       <HintPath>libs\BubbetsItems.dll</HintPath>
     </Reference>
-	  <Reference Include="RiskOfOptions">
-		  <HintPath>libs\RiskOfOptions.dll</HintPath>
-	  </Reference>
+	<Reference Include="RiskOfOptions">
+		<HintPath>libs\RiskOfOptions.dll</HintPath>
+	</Reference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\firstitem_assets">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
     <None Update="Assets\ShrineOfRepair.language">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\shrinerepair">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="firstitem_assets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Languages\ShrineOfRepair.language">
