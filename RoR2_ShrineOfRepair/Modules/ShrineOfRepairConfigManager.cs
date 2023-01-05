@@ -110,7 +110,29 @@ namespace ShrineOfRepair.Modules
             PickerUseLunarByDefault = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins by Default", false, "Set to true to make every shrine act like Bazaar's shrines.");
 
             PickerShowFree = perItemConfig.Bind("Display", "Display Cost for Free", false, "Set to true to display $0 for free entries.");
-        }
 
+            if (RiskOfOptionsCompat.enabled)
+            {
+                RiskOfOptionsCompat.SetDescription();
+                RiskOfOptionsCompat.SetIcon();
+
+                RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldTier1Cost);
+                RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldTier2Cost);
+                RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldTier3Cost, 0, 400);
+                RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldBossCost);
+                RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldLunarCost);
+                RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldEquipCost);
+
+                RiskOfOptionsCompat.CreateNewOption(BazaarLunarMultiplier);
+
+                RiskOfOptionsCompat.CreateNewOption(PickerUseLunarByDefault);
+                RiskOfOptionsCompat.CreateNewOption(PickerShowFree);
+
+                RiskOfOptionsCompat.CreateNewOption(MaxUses, 0, 50);
+                RiskOfOptionsCompat.CreateNewOption(SpawnInBazaar);
+                RiskOfOptionsCompat.CreateNewOption(SpawnInMoon);
+            }
+
+        }
     }
 }

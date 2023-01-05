@@ -23,6 +23,9 @@
     <Reference Include="BubbetsItems">
       <HintPath>libs\BubbetsItems.dll</HintPath>
     </Reference>
+	  <Reference Include="RiskOfOptions">
+		  <HintPath>libs\RiskOfOptions.dll</HintPath>
+	  </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +44,10 @@
     <None Update="Languages\ShrineOfRepair.language">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

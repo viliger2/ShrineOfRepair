@@ -6,11 +6,12 @@ using System.Reflection;
 
 namespace ShrineOfRepair.Modules
 {
-    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.2.3")]
+    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.3.0")]
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInDependency(PrefabAPI.PluginGUID)]
     [BepInDependency(DirectorAPI.PluginGUID)]
     [BepInDependency("bubbet.bubbetsitems", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.rune580.riskofoptions", BepInDependency.DependencyFlags.SoftDependency)]
 
     public class ShrineOfRepairPlugin : BaseUnityPlugin
     {
@@ -27,6 +28,8 @@ namespace ShrineOfRepair.Modules
             PInfo = Info;
 
             MyLogger = Logger;
+
+            new ShrineofRepairAssets().Init();
 
             new ShrineOfRepairLanguages().Init();
 
