@@ -1,4 +1,9 @@
 <details>
+<summary>1.4.1 </summary>
+
+* Restored original methods and marked them as depricated. Sorry about that.
+</details>
+<details>
 <summary>1.4.0 </summary>
 
 * Reworked list extension for mod developers, so if you decide to implement it, your mod won't throw errrors if ShrineOfRepair is not present. It does require a slight rewrite, example can be seen [here](https://github.com/viliger2/ExtradimensionaItems/blob/master/RoR2_ItemsMod/Modules/ShrineOfRepairCompat.cs).
