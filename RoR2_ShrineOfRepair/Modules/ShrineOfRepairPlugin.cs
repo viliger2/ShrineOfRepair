@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace ShrineOfRepair.Modules
 {
-    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.3.0")]
+    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.4.0")]
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInDependency(PrefabAPI.PluginGUID)]
     [BepInDependency(DirectorAPI.PluginGUID)]
@@ -21,9 +21,9 @@ namespace ShrineOfRepair.Modules
 
         private void Awake()
         {
-            //#if DEBUG == true
-            //On.RoR2.Networking.NetworkManagerSystemSteam.OnClientConnect += (s, u, t) => { };
-            //#endif
+            #if DEBUG == true
+            On.RoR2.Networking.NetworkManagerSystemSteam.OnClientConnect += (s, u, t) => { };
+            #endif
 
             PInfo = Info;
 

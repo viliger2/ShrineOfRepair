@@ -45,7 +45,8 @@ namespace ShrineOfRepair.Modules.Interactables
                 }
             }
 
-            RepairItemsDictionary = ModExtension.FillDictionaryFromMods(RepairItemsDictionary);
+            RepairItemsDictionary = ModExtension.FillItemDictionaryFromMods(RepairItemsDictionary);
+            RepairEquipmentsDictionary = ModExtension.FillEquipmentDictionaryFromMods(RepairEquipmentsDictionary);
             ShrineOfRepairPlugin.MyLogger.LogDebug("Items");
             foreach (var kv in RepairItemsDictionary) ShrineOfRepairPlugin.MyLogger.LogDebug(ItemCatalog.GetItemDef(kv.Key).name + " -> " + ItemCatalog.GetItemDef(kv.Value).name);
             ShrineOfRepairPlugin.MyLogger.LogDebug("Equipments");
