@@ -3,6 +3,7 @@ using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using static ShrineOfRepair.Modules.ShrineofRepairAssets;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 
@@ -96,22 +97,23 @@ namespace ShrineOfRepair.Modules.Interactables
 
         private List<DirectorAPI.Stage> GetNormalStageList()
         {
-            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
+            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>
+            {
+                DirectorAPI.Stage.DistantRoost,
+                DirectorAPI.Stage.AbyssalDepths,
+                DirectorAPI.Stage.TitanicPlains,
+                DirectorAPI.Stage.SunderedGrove,
+                DirectorAPI.Stage.SirensCall,
+                DirectorAPI.Stage.SkyMeadow,
+                DirectorAPI.Stage.SulfurPools,
+                DirectorAPI.Stage.ScorchedAcres,
+                DirectorAPI.Stage.AphelianSanctuary,
 
-            stageList.Add(DirectorAPI.Stage.DistantRoost);
-            stageList.Add(DirectorAPI.Stage.AbyssalDepths);
-            stageList.Add(DirectorAPI.Stage.TitanicPlains);
-            stageList.Add(DirectorAPI.Stage.SunderedGrove);
-            stageList.Add(DirectorAPI.Stage.SirensCall);
-            stageList.Add(DirectorAPI.Stage.SkyMeadow);
-            stageList.Add(DirectorAPI.Stage.SulfurPools);
-            stageList.Add(DirectorAPI.Stage.ScorchedAcres);
-            stageList.Add(DirectorAPI.Stage.AphelianSanctuary);
-
-            stageList.Add(DirectorAPI.Stage.AbyssalDepthsSimulacrum);
-            stageList.Add(DirectorAPI.Stage.TitanicPlainsSimulacrum);
-            stageList.Add(DirectorAPI.Stage.SkyMeadowSimulacrum);
-            stageList.Add(DirectorAPI.Stage.AphelianSanctuarySimulacrum);
+                DirectorAPI.Stage.AbyssalDepthsSimulacrum,
+                DirectorAPI.Stage.TitanicPlainsSimulacrum,
+                DirectorAPI.Stage.SkyMeadowSimulacrum,
+                DirectorAPI.Stage.AphelianSanctuarySimulacrum
+            };
 
             return stageList;
 
@@ -119,12 +121,13 @@ namespace ShrineOfRepair.Modules.Interactables
 
         private List<DirectorAPI.Stage> GetSnowyStageList()
         {
-            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
+            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>
+            {
+                DirectorAPI.Stage.SiphonedForest,
+                DirectorAPI.Stage.RallypointDelta,
 
-            stageList.Add(DirectorAPI.Stage.SiphonedForest);
-            stageList.Add(DirectorAPI.Stage.RallypointDelta);
-
-            stageList.Add(DirectorAPI.Stage.RallypointDeltaSimulacrum);
+                DirectorAPI.Stage.RallypointDeltaSimulacrum
+            };
 
             return stageList;
 
@@ -132,11 +135,12 @@ namespace ShrineOfRepair.Modules.Interactables
 
         private List<DirectorAPI.Stage> GetSandyStageList()
         {
-            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>();
+            List<DirectorAPI.Stage> stageList = new List<DirectorAPI.Stage>
+            {
+                DirectorAPI.Stage.AbandonedAqueduct,
 
-            stageList.Add(DirectorAPI.Stage.AbandonedAqueduct);
-
-            stageList.Add(DirectorAPI.Stage.AbandonedAqueductSimulacrum);
+                DirectorAPI.Stage.AbandonedAqueductSimulacrum
+            };
 
             return stageList;
 
@@ -162,20 +166,65 @@ namespace ShrineOfRepair.Modules.Interactables
                     //SpawnShrine(new Vector3(-139.5f, -25.5f, -19.9f), new Vector3(0f, 0f, 0f));
                     SpawnShrine(BazaarPosition.Value, BazaarAngle.Value);
                 }
-            }
-            ;
-
-            On.RoR2.Stage.Start += (orig, self) =>
-            {
-                orig(self);
-                if (SpawnInMoon.Value)
-                {
-                    //if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(new Vector3(749.4f, 253f, -244.3f), new Vector3(0f, 143.2f, 0f));
-                    //else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(new Vector3(-3.9f, -150.6f, -331.2f), new Vector3(-70f, 164f, 0f));
-                    if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(MoonPosition.Value, MoonAngle.Value);
-                    else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(Moon2Position.Value, Moon2Angle.Value);
-                }
             };
+
+            RoR2.SceneDirector.onPostPopulateSceneServer += SceneDirector_onPostPopulateSceneServer;
+            On.RoR2.UI.ScrapperInfoPanelHelper.ShowInfo += ScrapperInfoPanelHelper_ShowInfo;
+        }
+
+        private void ScrapperInfoPanelHelper_ShowInfo(On.RoR2.UI.ScrapperInfoPanelHelper.orig_ShowInfo orig, RoR2.UI.ScrapperInfoPanelHelper self, RoR2.UI.MPButton button, PickupDef pickupDef)
+        {
+            orig(self, button, pickupDef);
+            var parent = self.gameObject.transform;
+            if (!parent.name.Contains("ShrineRepair"))
+            {
+                while (parent.parent)
+                {
+                    parent = parent.parent;
+                    if (parent.name.Contains("ShrineRepair"))
+                    {
+                        break;
+                    };
+                }
+            }
+            if (parent.name.Contains("ShrineRepair"))
+            {
+                var itemDef = ItemCatalog.GetItemDef(pickupDef.itemIndex);
+                if(itemDef != default(ItemDef))
+                {
+                    if (RepairItemsDictionary.TryGetValue(itemDef.itemIndex, out var repairedItemIndex))
+                    {
+                        var repairedItemDef = ItemCatalog.GetItemDef(repairedItemIndex);
+                        if (repairedItemDef != default(ItemDef))
+                        {
+                            self.correspondingScrapImage.sprite = repairedItemDef.pickupIconSprite;
+                        }
+                    }
+                } else
+                {
+                    var equipmentDef = EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex);
+                    if (equipmentDef != default(EquipmentDef))
+                    {
+                        if (RepairEquipmentsDictionary.TryGetValue(equipmentDef.equipmentIndex, out var repairedEquipmentIndex))
+                        {
+                            var repairedEquipmentDef = EquipmentCatalog.GetEquipmentDef(repairedEquipmentIndex);
+                            if (repairedEquipmentDef != default(EquipmentDef))
+                            {
+                                self.correspondingScrapImage.sprite = repairedEquipmentDef.pickupIconSprite;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SceneDirector_onPostPopulateSceneServer(SceneDirector obj)
+        {
+            if (SpawnInMoon.Value)
+            {
+                if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon")) SpawnShrine(MoonPosition.Value, MoonAngle.Value);
+                else if (SceneCatalog.GetSceneDefForCurrentScene() == SceneCatalog.GetSceneDefFromSceneName("moon2")) SpawnShrine(Moon2Position.Value, Moon2Angle.Value);
+            }
         }
     }
 }
