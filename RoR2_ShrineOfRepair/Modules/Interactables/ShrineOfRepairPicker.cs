@@ -165,7 +165,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 coefficient = Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 1.25f);
                 uses = 0;
                 var scene = SceneCatalog.GetSceneDefForCurrentScene();
-                useLunarCoins = PickerUseLunarByDefault.Value || (scene == SceneCatalog.GetSceneDefFromSceneName("bazaar")) || (UseLunarInMoon.Value && (scene == SceneCatalog.GetSceneDefFromSceneName("moon") || scene == SceneCatalog.GetSceneDefFromSceneName("moon2")));
+                useLunarCoins = PickerUseLunarByDefault.Value || (BazaarUseLunar.Value && scene == SceneCatalog.GetSceneDefFromSceneName("bazaar")) || (UseLunarInMoon.Value && (scene == SceneCatalog.GetSceneDefFromSceneName("moon") || scene == SceneCatalog.GetSceneDefFromSceneName("moon2")));
 
                 On.RoR2.UI.PickupPickerPanel.OnCreateButton += (orig, self, index, button) =>
                 {
