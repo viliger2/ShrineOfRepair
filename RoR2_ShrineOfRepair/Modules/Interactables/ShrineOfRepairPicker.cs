@@ -1,6 +1,7 @@
 ﻿using R2API;
 using RoR2;
 using RoR2.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -172,8 +173,10 @@ namespace ShrineOfRepair.Modules.Interactables
                     orig(self, index, button);
                     if (self.name.Contains("ShrineRepair") && self == pickupPickerController.panelInstanceController)
                     {
-                        CharacterMaster master = interactor ? interactor.GetComponent<CharacterBody>().master : LocalUserManager.GetFirstLocalUser().cachedMasterController.master;
+                        var body = interactor.GetComponent<CharacterBody>();
+                        CharacterMaster master = interactor ? body.master : LocalUserManager.GetFirstLocalUser().cachedMasterController.master;
 
+                        var hasFreeUnlocks = body.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
                         PickupDef pickupDef = PickupCatalog.GetPickupDef(self.pickerController.options[index].pickupIndex);
                         FillRepairItemsDictionary();
                         bool isItem = RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex);
@@ -198,7 +201,14 @@ namespace ShrineOfRepair.Modules.Interactables
                                 counterText.fontSize = 20f;
                                 counterText.faceColor = useLunarCoins ? Color.white : Color.yellow;
                                 counterText.outlineWidth = 0.2f;
-                                counterText.text = (useLunarCoins ? "<sprite name=\"LunarCoin\" tint=1>" : "$") + (isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost());
+                                if (hasFreeUnlocks)
+                                {
+                                    counterText.text = "FREE";
+                                }
+                                else
+                                {
+                                    counterText.text = (useLunarCoins ? "<sprite name=\"LunarCoin\" tint=1>" : "$") + (isItem ? GetTotalStackCost(tier, count) : GetEquipmentCost());
+                                }
 
                                 counterRect.localPosition = Vector3.zero;
                                 counterRect.anchorMin = Vector2.zero;
@@ -257,6 +267,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 {
                     PickupDef pickupDef = PickupCatalog.GetPickupDef(new PickupIndex(selection));
                     CharacterBody body = interactor.GetComponent<CharacterBody>();
+                    var hasFreeUnlocks = body.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
                     int numberOfItems = body.inventory.GetItemCount(pickupDef.itemIndex);
                     FillRepairItemsDictionary();
 
@@ -268,7 +279,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     if (isItem || RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                     {
                         uint cost = isItem ? GetTotalStackCost(tier, numberOfItems) : GetEquipmentCost();
-                        if (cost > (useLunarCoins ? body.master.playerCharacterMasterController.networkUser.lunarCoins : body.master.money))
+                        if (cost > (useLunarCoins ? body.master.playerCharacterMasterController.networkUser.lunarCoins : body.master.money) && !hasFreeUnlocks)
                         {
                             MyLogger.LogWarning(string.Format("Somehow player {0} ({1}) has less currency than price of {2}x{3}, yet it was available at the start of interaction. Doing nothing...", body.GetUserName(), body.name, pickupDef.nameToken, numberOfItems));
                             return;
@@ -295,9 +306,17 @@ namespace ShrineOfRepair.Modules.Interactables
                             pickupAmountString = "";
                         }
 
-                        if (useLunarCoins) body.master.playerCharacterMasterController.networkUser.DeductLunarCoins(cost);
-                        else body.master.money -= cost;
-                        MyLogger.LogMessage(string.Format("Player {0} ({1}) paid {2} {3} to repair {4}x{5}", body.GetUserName(), body.name, cost, useLunarCoins ? "lunar coins" : "money", pickupDef.nameToken, numberOfItems));
+                        if (hasFreeUnlocks) 
+                        {
+                            body.RemoveBuff(DLC2Content.Buffs.FreeUnlocks);
+                            Util.PlaySound("Play_item_proc_onLevelUpFreeUnlock_activate", base.gameObject);
+                        }
+                        else
+                        {
+                            if (useLunarCoins) body.master.playerCharacterMasterController.networkUser.DeductLunarCoins(cost);
+                            else body.master.money -= cost;
+                            MyLogger.LogMessage(string.Format("Player {0} ({1}) paid {2} {3} to repair {4}x{5}", body.GetUserName(), body.name, cost, useLunarCoins ? "lunar coins" : "money", pickupDef.nameToken, numberOfItems));
+                        }
 
                         EffectManager.SpawnEffect(Resources.Load<GameObject>("Prefabs/Effects/ShrineUseEffect"), new EffectData()
                         {
@@ -341,6 +360,7 @@ namespace ShrineOfRepair.Modules.Interactables
                 List<PickupPickerController.Option> options = new List<PickupPickerController.Option>();
 
                 var charBody = interactor.GetComponent<CharacterBody>();
+                var hasFreeUnlocks = charBody.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
                 if (charBody && charBody.master)
                 {
                     var currentCurrency = useLunarCoins ? charBody.master.playerCharacterMasterController.networkUser.lunarCoins : charBody.master.money;
@@ -353,7 +373,7 @@ namespace ShrineOfRepair.Modules.Interactables
                         {
                             options.Add(new PickupPickerController.Option
                             {
-                                available = currentCurrency >= GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount),
+                                available = (currentCurrency >= GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount)) || hasFreeUnlocks,
                                 pickupIndex = PickupCatalog.FindPickupIndex(pairedItems.Key)
                             });
                         }
@@ -362,7 +382,7 @@ namespace ShrineOfRepair.Modules.Interactables
                     {
                         options.Add(new PickupPickerController.Option
                         {
-                            available = currentCurrency >= GetEquipmentCost(),
+                            available = currentCurrency >= GetEquipmentCost() || hasFreeUnlocks,
                             pickupIndex = PickupCatalog.FindPickupIndex(charBody.equipmentSlot.equipmentIndex)
                         });
                     }

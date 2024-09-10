@@ -111,7 +111,6 @@ namespace ShrineOfRepair.Modules
             BazaarLunarMultiplier = perItemConfig.Bind("Bazaar Shrines", "Bazaar Lunar Coin Multiplier", 0.04f, "Lunar Coin cost multiplier for Bazaar shrines. Disabled if currency type is not gold. 25 gold per 1 coin by default. set to 0 for free.");
             PickerUseLunarByDefault = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins by Default", false, "Set to true to make every shrine act like Bazaar's shrines.");
 
-
             PickerShowFree = perItemConfig.Bind("Display", "Display Cost for Free", false, "Set to true to display $0 for free entries.");
 
             if (RiskOfOptionsCompat.enabled)

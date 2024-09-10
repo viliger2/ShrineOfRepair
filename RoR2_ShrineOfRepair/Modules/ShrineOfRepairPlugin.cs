@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace ShrineOfRepair.Modules
 {
-    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.4.3")]
+    [BepInPlugin("com.Viliger.ShrineOfRepair", "ShrineOfRepair", "1.4.4")]
     [BepInDependency(LanguageAPI.PluginGUID)]
     [BepInDependency(PrefabAPI.PluginGUID)]
     [BepInDependency(DirectorAPI.PluginGUID)]
