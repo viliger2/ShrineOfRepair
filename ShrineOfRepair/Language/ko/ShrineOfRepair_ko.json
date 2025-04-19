@@ -1,0 +1,11 @@
+﻿{
+  "strings": {
+    "INTERACTABLE_SHRINE_REPAIR_NAME": "수리의 성소",
+    "INTERACTABLE_SHRINE_REPAIR_CONTEXT": "아이템 수리하기",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">아이템을 수리했습니다.</style>",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\">{0} 님이 아이템을 수리했습니다.</style>",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER_2P": "<style=\"cShrine\">수리:</style> {1}{2}.",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER": "<style=\"cShrine\">{0} 님이 수리:</style> {1}{2}.",
+    "INTERACTABLE_SHRINE_REPAIR_PICKERPANEL_HEADER": "<b>수리의 성소</b><br><i><style=\"cSub\"><size=75%>똑똑한 발명품을 반값에 고친다!</size></style></i>"
+  }
+}

@@ -5,7 +5,7 @@ using RiskOfOptions.Options;
 using RoR2;
 using UnityEngine;
 
-namespace ShrineOfRepair.Modules
+namespace ShrineOfRepair.ModCompat
 {
     public static class RiskOfOptionsCompat
     {
@@ -28,9 +28,8 @@ namespace ShrineOfRepair.Modules
             ModSettingsManager.SetModDescription("Shrine to repair your broken items.", "com.Viliger.ShrineOfRepair", "ShrineOfRepair");
         }
 
-        public static void SetIcon()
+        public static void SetIcon(Sprite icon)
         {
-            Sprite icon = ShrineofRepairAssets.MainBundle.LoadAsset<Sprite>("texRiskOfOptionsIcon.png");
             ModSettingsManager.SetModIcon(icon, "com.Viliger.ShrineOfRepair", "ShrineOfRepair");
         }
 
