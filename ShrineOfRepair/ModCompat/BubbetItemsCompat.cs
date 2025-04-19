@@ -1,7 +1,7 @@
 ﻿using BubbetsItems;
 using RoR2;
 
-namespace ShrineOfRepair.Modules
+namespace ShrineOfRepair.ModCompat
 {
     public static class BubbetItemsCompat
     {

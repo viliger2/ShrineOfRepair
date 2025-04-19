@@ -1,7 +1,7 @@
 ﻿using RoR2;
+using ShrineOfRepair;
 using System;
 using System.Collections.Generic;
-using static ShrineOfRepair.Modules.ShrineOfRepairPlugin;
 
 namespace ShrineOfRepair.Modules
 {
@@ -33,7 +33,7 @@ namespace ShrineOfRepair.Modules
         public static void AddItemsListener(DictionaryFillItemsDelegate callback)
         {
             fillItemsDictionaryHandler += callback;
-            MyLogger.LogMessage($"Added {callback.Method} to fillItemsDictionaryHandler");
+            Log.Info($"Added {callback.Method} to fillItemsDictionaryHandler");
         }
 
         public static void AddItemsToList(ItemIndex brokentItem, ItemIndex repairedItem, string modName)
@@ -44,7 +44,7 @@ namespace ShrineOfRepair.Modules
         public static void AddEquipmentListener(DictionaryFillEquipmentDelegate callback)
         {
             fillEquipmentDictionaryHandler += callback;
-            MyLogger.LogMessage($"Added {callback.Method} to fillEquipmentDictionaryHandler");
+            Log.Info($"Added {callback.Method} to fillEquipmentDictionaryHandler");
         }
 
         public static void AddEquipmentToList(EquipmentIndex brokenEquipment, EquipmentIndex repairedEquipment, string modName)
@@ -64,7 +64,7 @@ namespace ShrineOfRepair.Modules
                 if (!dictionary.ContainsKey(item.brokenItem))
                 {
                     dictionary.Add(item.brokenItem, item.repairedItem);
-                    MyLogger.LogMessage(string.Format("Added item repairs from {0} to {1} from mod {2}.", ItemCatalog.GetItemDef(item.brokenItem)?.name, ItemCatalog.GetItemDef(item.repairedItem)?.name, item.modName));
+                    Log.Info(string.Format("Added item repairs from {0} to {1} from mod {2}.", ItemCatalog.GetItemDef(item.brokenItem)?.name, ItemCatalog.GetItemDef(item.repairedItem)?.name, item.modName));
                 }
             }
 
@@ -83,7 +83,7 @@ namespace ShrineOfRepair.Modules
                 if (!dictionary.ContainsKey(item.brokenEquipment))
                 {
                     dictionary.Add(item.brokenEquipment, item.repairedEquipment);
-                    MyLogger.LogMessage(string.Format("Added equipment repairs from {0} to {1} from mod {2}.", EquipmentCatalog.GetEquipmentDef(item.brokenEquipment)?.name, EquipmentCatalog.GetEquipmentDef(item.repairedEquipment)?.name, item.modName));
+                    Log.Info(string.Format("Added equipment repairs from {0} to {1} from mod {2}.", EquipmentCatalog.GetEquipmentDef(item.brokenEquipment)?.name, EquipmentCatalog.GetEquipmentDef(item.repairedEquipment)?.name, item.modName));
                 }
             }
 
@@ -111,7 +111,7 @@ namespace ShrineOfRepair.Modules
         public static void AddListener(DictionaryFillDelegate callback)
         {
             fillDictionaryHandler += callback;
-            MyLogger.LogMessage($"Added {callback.Method} to dictionaryFillHandler");
+            Log.Info($"Added {callback.Method} to dictionaryFillHandler");
         }
 
         [Obsolete("Deprecated, only used for compatability with older versions.")]
@@ -127,7 +127,7 @@ namespace ShrineOfRepair.Modules
                 if (!dictionary.ContainsKey(item.brokenItem))
                 {
                     dictionary.Add(item.brokenItem, item.repairedItem);
-                    MyLogger.LogMessage(string.Format("Added repairs from {0} to {1} from a mod.", ItemCatalog.GetItemDef(item.brokenItem)?.name, ItemCatalog.GetItemDef(item.repairedItem).name));
+                    Log.Info(string.Format("Added repairs from {0} to {1} from a mod.", ItemCatalog.GetItemDef(item.brokenItem)?.name, ItemCatalog.GetItemDef(item.repairedItem).name));
                 }
             }
 

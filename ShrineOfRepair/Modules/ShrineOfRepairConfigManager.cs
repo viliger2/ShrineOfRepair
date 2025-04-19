@@ -1,8 +1,9 @@
 ﻿using BepInEx.Configuration;
 using R2API;
+using ShrineOfRepair.ModCompat;
 using System.IO;
 using UnityEngine;
-using static ShrineOfRepair.Modules.Interactables.ShrineOfRepairPurchase;
+using static ShrineOfRepair.ShrineOfRepairStuff;
 
 namespace ShrineOfRepair.Modules
 {
@@ -31,6 +32,8 @@ namespace ShrineOfRepair.Modules
 
         public static ConfigEntry<Vector3> Moon2Position;
         public static ConfigEntry<Vector3> Moon2Angle;
+
+        public static ConfigEntry<bool> RepairVoidItems;
 
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
@@ -66,11 +69,19 @@ namespace ShrineOfRepair.Modules
             DirectorWeight = mainConfig.Bind("Director", "Director Weight", 1, "Weight of the shrine for director. The lower the value, the more rare the shrine is. By default has the same weight as Shrine of Order, the only difference is that it can spawn anywhere.");
             DirectorCategory = mainConfig.Bind("Director", "Director Category", DirectorAPI.InteractableCategory.Shrines, "Category of interactable. If you change this, then you should also change Director Cost and Director Weight, as default values for those are balanced around it being spawned as a shrine.");
 
-            RepairList = mainConfig.Bind("RepairList", "Repair List", "ExtraLifeConsumed - ExtraLife, ExtraLifeVoidConsumed - ExtraLifeVoid, FragileDamageBonusConsumed - FragileDamageBonus, HealingPotionConsumed - HealingPotion, RegeneratingScrapConsumed - RegeneratingScrap, BossHunterConsumed - BossHunter, LowerPricedChestsConsumed - LowerPricedChests",
+            RepairList = mainConfig.Bind("RepairList", "Repair List", 
+                "ExtraLifeConsumed - ExtraLife, " +
+                "ExtraLifeVoidConsumed - ExtraLifeVoid, " +
+                "FragileDamageBonusConsumed - FragileDamageBonus, " +
+                "HealingPotionConsumed - HealingPotion, " +
+                "RegeneratingScrapConsumed - RegeneratingScrap, " +
+                "BossHunterConsumed - BossHunter, " +
+                "LowerPricedChestsConsumed - LowerPricedChests, " +
+                "TeleportOnLowHealthConsumed - TeleportOnLowHealth, " +
+                "HealAndReviveConsumed - HealAndRevive",
                 "Main Repair List, by default filled with pairs of breakable-original vanilla items, can be used to create custom pairs of brokenItem - repairedItem, including those from mods. Syntax: (broken) - (new), delimiter: ','");
 
             UsePickupPickerPanel = mainConfig.Bind("Interactable Type", "Use Scrapper-like variation", true, "Use scrapper-like variant, with separate cost for each broken item and ability to select what you want to repair. Scrapper-like variant only works with gold. Setting this to false will return the mod to its pre 1.2.0 function. Each variant has its own config file, AllInOne for pre-1.2.0 version and PerItem for newer.");
-
 
             MaxUses = mainConfig.Bind("General", "Max Uses", 1, "Amount of times a single shrine can repair before deactivating. Set to 0 for infinite.");
             UseLunarInMoon = mainConfig.Bind("General", "Use Lunar Coins in Moon", false, "Make the Commencement shrine act like Bazaar shrine.");
@@ -85,6 +96,8 @@ namespace ShrineOfRepair.Modules
 
             Moon2Position = mainConfig.Bind("Commencement", "Shrine Position in Commencement", new Vector3(-3.9f, -150.6f, -331.2f), "Position of the shrine in Commencement");
             Moon2Angle = mainConfig.Bind("Commencement", "Shrine Angle in Commencement", new Vector3(-70f, 164f, 0f), "Angle (rotation) of the shrine in Commencement");
+
+            RepairVoidItems = mainConfig.Bind("Void Items", "Repair Void Items", true, "Enables the ability to repair void items back into their normal versions. If void item has multiple normal versions then it is skipped (like VoidRing or VoidBossItem). Items are filled dynamically from list of contagious items, so you don't need to fill the dictionary manually like with other breakable items.");
 
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 
@@ -116,7 +129,6 @@ namespace ShrineOfRepair.Modules
             if (RiskOfOptionsCompat.enabled)
             {
                 RiskOfOptionsCompat.SetDescription();
-                RiskOfOptionsCompat.SetIcon();
 
                 RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldTier1Cost);
                 RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldTier2Cost);

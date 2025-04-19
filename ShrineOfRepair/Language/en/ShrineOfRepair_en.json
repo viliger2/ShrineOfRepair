@@ -1,0 +1,15 @@
+﻿{
+  "strings": {
+    "INTERACTABLE_SHRINE_REPAIR_NAME": "Shrine of Repair",
+    "INTERACTABLE_SHRINE_REPAIR_LORE": "lol, lmao even",
+    "INTERACTABLE_SHRINE_REPAIR_DESCRIPTION_PICKER": "Allows you to repair a single item stack of your selection. Price of repair will be shown on the icon.",
+    "INTERACTABLE_SHRINE_REPAIR_DESCRIPTION_PURCHASE": "Repairs all broken items.",
+    "INTERACTABLE_SHRINE_REPAIR_CONTEXT": "Repair items?",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT_2P": "<style=\"cShrine\">You repaired items.</style>",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT": "<style=\"cShrine\">{0} repaired items.</style>",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER_2P": "<style=\"cShrine\">You repaired</style> {1}{2}.",
+    "INTERACTABLE_SHRINE_REPAIR_INTERACT_PICKER": "<style=\"cShrine\">{0} repaired</style> {1}{2}.",
+    "INTERACTABLE_SHRINE_REPAIR_PICKERPANEL_HEADER": "<b>Shrine of Repair</b><br><i><style=\"cSub\"><size=75%>Fixing smart design decisions for half the price!</size></style></i>",
+    "ITEM_HEALINGPOTIONCONSUMED_DESC": "Imagine being Hopoo and not implementing descriptions for base game items."
+  }
+}
