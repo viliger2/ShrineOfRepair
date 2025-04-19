@@ -1,12 +1,12 @@
 <details>
-<details>
 <summary>2.0.0 </summary>
 
 * Actual SoTS update, added support for all breakable items (Sale Star, Unstable Transmitter and Seed of Life).
 * Mod is mostly rewritten with less jank, config and API should still be the same.
 * Added option to repair void items.
-  * Repair list for void items is dynamically generated from ContagiousItemManager, so any modded item should automatically be added to the list without any input from the user. However, if void item has multiple "source" items, such as Singularity Band or Newly Hatched Zoea then it won't be added to the list due to inability to find the source (well, actually it is mostly implementation limitation, I would be fine with Zoea showing you every possible boss item in the game). 
+  * _Repair list for void items is dynamically generated from ContagiousItemManager, so any modded item should automatically be added to the list without any input from the user. However, if void item has multiple "source" items, such as Singularity Band or Newly Hatched Zoea then it won't be added to the list due to inability to find the source (well, actually it is mostly implementation limitation, I would be fine with Zoea showing you every possible boss item in the game)_. 
 </details>
+<details>
 <summary>1.4.4 </summary>
 
 * Added Longstanding Solitude support.
