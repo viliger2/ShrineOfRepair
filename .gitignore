@@ -350,10 +350,7 @@ MigrationBackup/
 .ionide/
 
 #myfilter
-RoR2_ShrineOfRepair/Assets/Assets
-*.manifest
-thunderstore/
-ShrineOfRepairUnity/
 RoR2_ShrineOfRepair/libs
 ShrineOfRepair/Weaver/libs/
 ShrineOfRepair/libs/
+thunderstore/plugins/viliger-ShrineOfRepair/
