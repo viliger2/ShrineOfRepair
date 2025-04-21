@@ -1,6 +1,6 @@
 {
     "name": "ShrineOfRepair",
-    "version_number": "2.0.0",
+    "version_number": "2.0.1",
     "website_url": "https://github.com/viliger2/ShrineOfRepair",
     "description": "Shrine to repair your broken items. Fixed for SoTS with ability to repair void items.",
     "dependencies": [

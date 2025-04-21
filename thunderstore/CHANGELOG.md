@@ -1,4 +1,10 @@
 <details>
+<summary>2.0.1 </summary>
+
+* Added void coin support to Picker variant.
+  * _This also removes "Use Lunar Coins by Default" option and replaces it with "Currency Type" option that allows you to set gold, void or lunar coins as general currency for the shrine. Bazaar and moon shrines are not affected by this and are still controlled by their respective config options._
+</details>
+<details>
 <summary>2.0.0 </summary>
 
 * Actual SoTS update, added support for all breakable items (Sale Star, Unstable Transmitter and Seed of Life).
