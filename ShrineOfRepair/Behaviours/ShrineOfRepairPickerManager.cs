@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
+using static ShrineOfRepair.ShrineOfRepairStuff;
 
 namespace ShrineOfRepair.Behaviours
 {
@@ -17,12 +18,12 @@ namespace ShrineOfRepair.Behaviours
 
         public Transform iconTransform;
 
+        public CostTypes costType;
+
         [SyncVar]
         public float coefficient;
 
         private Interactor interactor;
-
-        public bool useLunarCoins { get; private set; }
 
         private int uses;
 
@@ -34,9 +35,12 @@ namespace ShrineOfRepair.Behaviours
             }
             uses = 0;
             var scene = SceneCatalog.GetSceneDefForCurrentScene();
-            useLunarCoins = PickerUseLunarByDefault.Value
-                || BazaarUseLunar.Value && scene == SceneCatalog.GetSceneDefFromSceneName("bazaar")
-                || UseLunarInMoon.Value && (scene == SceneCatalog.GetSceneDefFromSceneName("moon") || scene == SceneCatalog.GetSceneDefFromSceneName("moon2"));
+
+            if(BazaarUseLunar.Value && scene == SceneCatalog.GetSceneDefFromSceneName("bazaar")
+                || UseLunarInMoon.Value && (scene == SceneCatalog.GetSceneDefFromSceneName("moon") || scene == SceneCatalog.GetSceneDefFromSceneName("moon2")))
+            {
+                costType = CostTypes.LunarCoin;
+            }
         }
 
         public void HandleSelection(int selection)
@@ -63,7 +67,7 @@ namespace ShrineOfRepair.Behaviours
                 if (isItem || ShrineOfRepairDictionary.RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                 {
                     uint cost = isItem ? GetTotalStackCost(tier, numberOfItems) : GetEquipmentCost();
-                    if (cost > (useLunarCoins ? body.master.playerCharacterMasterController.networkUser.lunarCoins : body.master.money) && !hasFreeUnlocks)
+                    if (cost > GetCurrentCurrencyValue(body.master) && !hasFreeUnlocks)
                     {
                         Log.Warning(string.Format("Somehow player {0} ({1}) has less currency than price of {2}x{3}, yet it was available at the start of interaction. Doing nothing...", body.GetUserName(), body.name, pickupDef.nameToken, numberOfItems));
                         return;
@@ -97,8 +101,7 @@ namespace ShrineOfRepair.Behaviours
                     }
                     else
                     {
-                        if (useLunarCoins) body.master.playerCharacterMasterController.networkUser.DeductLunarCoins(cost);
-                        else body.master.money -= cost;
+                        DeductCurrency(body.master, cost);
                     }
 
                     EffectManager.SpawnEffect(Resources.Load<GameObject>("Prefabs/Effects/ShrineUseEffect"), new EffectData()
@@ -146,7 +149,7 @@ namespace ShrineOfRepair.Behaviours
             var hasFreeUnlocks = charBody.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
             if (charBody && charBody.master)
             {
-                var currentCurrency = useLunarCoins ? charBody.master.playerCharacterMasterController.networkUser.lunarCoins : charBody.master.money;
+                var currentCurrency = GetCurrentCurrencyValue(charBody.master);
 
                 foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in ShrineOfRepairDictionary.RepairItemsDictionary)
                 {
@@ -173,20 +176,83 @@ namespace ShrineOfRepair.Behaviours
             }
         }
 
+        private void DeductCurrency(CharacterMaster master, uint value)
+        {
+            switch (costType)
+            {
+                default:
+                case CostTypes.Gold:
+                    master.money -= value;
+                    return;
+                case CostTypes.VoidCoin:
+                    master.voidCoins -= value;
+                    return;
+                case CostTypes.LunarCoin:
+                    master.playerCharacterMasterController.networkUser.DeductLunarCoins(value);
+                    return;
+            }
+        }
+
+        private uint GetCurrentCurrencyValue(CharacterMaster master)
+        {
+            switch (costType)
+            {
+                default:
+                case CostTypes.Gold:
+                    return master.money;
+                case CostTypes.VoidCoin:
+                    return master.voidCoins;
+                case CostTypes.LunarCoin:
+                    return master.playerCharacterMasterController.networkUser.lunarCoins;
+            }
+        }
+
         public uint GetTotalStackCost(ItemTier tier, int numberOfItems)
         {
-            if (GetCostFromItemTier(tier) <= 0) return 0;
-            var res = (uint)(GetCostFromItemTier(tier) * numberOfItems * (useLunarCoins ? BazaarLunarMultiplier.Value : coefficient));
-            if (res <= 0) return 1;
-            return res;
+            if (GetCostFromItemTier(tier) <= 0)
+            {
+                return 0;
+            }
+
+            var costInGoldBeforeScaling = (uint)(GetCostFromItemTier(tier) * numberOfItems);
+            if(costInGoldBeforeScaling <= 0)
+            {
+                costInGoldBeforeScaling = 1;
+            }
+            switch (costType)
+            {
+                case CostTypes.Gold:
+                default:
+                    return (uint)Mathf.Max((costInGoldBeforeScaling * coefficient), 1);
+                case CostTypes.VoidCoin:
+                    return (uint)Mathf.Max((costInGoldBeforeScaling * PickerVoidCoinMultiplier.Value), 1);
+                case CostTypes.LunarCoin:
+                    return (uint)Mathf.Max((costInGoldBeforeScaling * PickerLunarCoinMultiplier.Value), 1);
+            }
         }
 
         public uint GetEquipmentCost()
         {
-            if (PickerPanelGoldEquipCost.Value <= 0) return 0;
-            var res = (uint)(PickerPanelGoldEquipCost.Value * (useLunarCoins ? BazaarLunarMultiplier.Value : coefficient));
-            if (res <= 0) return 1;
-            return res;
+            if (PickerPanelGoldEquipCost.Value <= 0)
+            {
+                return 0;
+            }
+
+            var costInGoldBeforeScaling = (uint)(PickerPanelGoldEquipCost.Value);
+            if(costInGoldBeforeScaling <= 0)
+            {
+                costInGoldBeforeScaling = 1;
+            }
+            switch (costType)
+            {
+                case CostTypes.Gold:
+                default:
+                    return (uint)(costInGoldBeforeScaling * coefficient);
+                case CostTypes.VoidCoin:
+                    return (uint)(costInGoldBeforeScaling * Modules.ShrineOfRepairConfigManager.PickerVoidCoinMultiplier.Value);
+                case CostTypes.LunarCoin:
+                    return (uint)(costInGoldBeforeScaling * PickerLunarCoinMultiplier.Value);
+            }
         }
 
         private int GetCostFromItemTier(ItemTier tier)

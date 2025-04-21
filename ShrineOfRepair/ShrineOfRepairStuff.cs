@@ -124,6 +124,7 @@ namespace ShrineOfRepair
             var uiPromptController = prefab.AddComponent<NetworkUIPromptController>();
 
             var manager = prefab.AddComponent<ShrineOfRepairPickerManager>();
+            manager.costType = Modules.ShrineOfRepairConfigManager.PickerInteractionCurrencyType.Value;
             manager.iconTransform = iconTransform;
 
             var pickerController = prefab.AddComponent<PickupPickerController>();
@@ -384,5 +385,29 @@ namespace ShrineOfRepair
                     return PurchaseInteractionGoldBaseCost.Value;
             }
         }
+
+#if DEBUG
+        [ConCommand(commandName = "sor_give_void", flags = ConVarFlags.ExecuteOnServer)]
+        private static void CCGiveVoidCoins(ConCommandArgs args)
+        {
+            if(args.Count == 0)
+            {
+                return;
+            }
+
+            if (!TextSerialization.TryParseInvariant(args[0], out int result))
+            {
+                return;
+            }
+
+            var localPlayers = LocalUserManager.readOnlyLocalUsersList;
+            var localPlayer = localPlayers[0].cachedBody;
+
+            if (localPlayer)
+            {
+                localPlayer.master.voidCoins += (uint)result;
+            }
+        }
+#endif
     }
 }

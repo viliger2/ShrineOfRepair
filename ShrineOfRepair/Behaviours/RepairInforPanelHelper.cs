@@ -10,6 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static RoR2.ColorCatalog;
+using static ShrineOfRepair.ShrineOfRepairStuff;
 
 namespace ShrineOfRepairRewrite.Behaviours
 {
@@ -139,7 +140,7 @@ namespace ShrineOfRepairRewrite.Behaviours
             counterText.enableWordWrapping = false;
             counterText.alignment = TMPro.TextAlignmentOptions.BottomLeft;
             counterText.fontSize = 20f;
-            counterText.faceColor = manager.useLunarCoins ? Color.white : Color.yellow;
+            counterText.faceColor = Color.white;
             counterText.outlineWidth = 0.2f;
             if (hasFreeUnlocks)
             {
@@ -147,7 +148,7 @@ namespace ShrineOfRepairRewrite.Behaviours
             }
             else
             {
-                counterText.text = (manager.useLunarCoins ? "<sprite name=\"LunarCoin\" tint=1>" : "$") + (isItem ? manager.GetTotalStackCost(tier, count) : manager.GetEquipmentCost());
+                counterText.text = GetCurrencyText(manager.costType) + (isItem ? manager.GetTotalStackCost(tier, count) : manager.GetEquipmentCost());
             }
 
             counterRect.localPosition = Vector3.zero;
@@ -156,6 +157,20 @@ namespace ShrineOfRepairRewrite.Behaviours
             counterRect.localScale = Vector3.one;
             counterRect.sizeDelta = new Vector2(-10, -4);
             counterRect.anchoredPosition = Vector2.zero;
+        }
+
+        private string GetCurrencyText(CostTypes costType)
+        {
+            switch (costType)
+            {
+                default:
+                case CostTypes.Gold:
+                    return "$";
+                case CostTypes.VoidCoin:
+                    return "<sprite name=\"VoidCoin\" tint=1>";
+                case CostTypes.LunarCoin:
+                    return "<sprite name=\"LunarCoin\" tint=1>";
+            }
         }
     }
 }

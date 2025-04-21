@@ -47,6 +47,9 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<float> PurchaseInteractionGoldScalingModifier;
 
         // for PickupPickerPanel
+        public static ConfigEntry<CostTypes> PickerInteractionCurrencyType;
+        public static ConfigEntry<float> PickerVoidCoinMultiplier;
+
         public static ConfigEntry<int> PickerPanelGoldTier1Cost;
         public static ConfigEntry<int> PickerPanelGoldTier2Cost;
         public static ConfigEntry<int> PickerPanelGoldTier3Cost;
@@ -55,8 +58,8 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<int> PickerPanelGoldEquipCost;
 
         public static ConfigEntry<bool> BazaarUseLunar;
-        public static ConfigEntry<float> BazaarLunarMultiplier;
-        public static ConfigEntry<bool> PickerUseLunarByDefault;
+        public static ConfigEntry<float> PickerLunarCoinMultiplier;
+        //public static ConfigEntry<bool> PickerUseLunarByDefault;
         public static ConfigEntry<bool> PickerShowFree;
 
         public void Init(string configPath)
@@ -113,6 +116,10 @@ namespace ShrineOfRepair.Modules
 
             var perItemConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-PerItem.cfg"), true);
 
+            PickerInteractionCurrencyType = perItemConfig.Bind("Currency", "Currency Type", CostTypes.Gold, "Type of currency used to purchase shrine. Using anything other than \"Gold\" disables price scaling over time. Each currency has its own options.");
+            PickerVoidCoinMultiplier = perItemConfig.Bind("Currency", "Void Coin Multiplier", 0.04f, "Void Coin cost multiplier. Disabled if currency type is not gold. 25 gold per 1 coin by default. set to 0 for free.");
+            PickerLunarCoinMultiplier = perItemConfig.Bind("Currency", "Lunar Coin Multiplier", 0.04f, "Lunar Coin cost multiplier. Disabled if currency type is not gold. 25 gold per 1 coin by default. set to 0 for free.");
+
             PickerPanelGoldTier1Cost = perItemConfig.Bind("Per Item Repairs", "Tier 1 cost", 12, "Base cost of tier 1 (white) item repair. By default the cost is equal to the half of normal chest price, rounded down.");
             PickerPanelGoldTier2Cost = perItemConfig.Bind("Per Item Repairs", "Tier 2 cost", 25, "Base cost of tier 2 (green) item repair. By default the cost is equal to the half of large chest price.");
             PickerPanelGoldTier3Cost = perItemConfig.Bind("Per Item Repairs", "Tier 3 cost", 200, "Base cost of tier 3 (red) item repair. By default the cost is equal to the half of legendary chest price.");
@@ -121,8 +128,6 @@ namespace ShrineOfRepair.Modules
             PickerPanelGoldEquipCost = perItemConfig.Bind("Per Item Repairs", "Equipment cost", 50, "Base cost of equipments (orange) repair. By default the cost is equal to double tier 2 repair price.");
 
             BazaarUseLunar = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins in Bazaar", true, "Shrine spawned in Bazaar uses lunar coins. If disabled it will use gold instead.");
-            BazaarLunarMultiplier = perItemConfig.Bind("Bazaar Shrines", "Bazaar Lunar Coin Multiplier", 0.04f, "Lunar Coin cost multiplier for Bazaar shrines. Disabled if currency type is not gold. 25 gold per 1 coin by default. set to 0 for free.");
-            PickerUseLunarByDefault = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins by Default", false, "Set to true to make every shrine act like Bazaar's shrines.");
 
             PickerShowFree = perItemConfig.Bind("Display", "Display Cost for Free", false, "Set to true to display $0 for free entries.");
 
@@ -137,9 +142,8 @@ namespace ShrineOfRepair.Modules
                 RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldLunarCost);
                 RiskOfOptionsCompat.CreateNewOption(PickerPanelGoldEquipCost);
 
-                RiskOfOptionsCompat.CreateNewOption(BazaarLunarMultiplier);
+                RiskOfOptionsCompat.CreateNewOption(PickerLunarCoinMultiplier);
 
-                RiskOfOptionsCompat.CreateNewOption(PickerUseLunarByDefault);
                 RiskOfOptionsCompat.CreateNewOption(PickerShowFree);
 
                 RiskOfOptionsCompat.CreateNewOption(MaxUses, 0, 50);
