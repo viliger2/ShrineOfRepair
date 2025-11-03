@@ -1,4 +1,11 @@
 <details>
+<summary>2.0.2 </summary>
+
+* Added [Ephemeral Coins](https://thunderstore.io/package/prodzpod/Ephemeral_Coins/) compat.
+  * _This specifically fixes issues related to picker variant, where you might either get items unavailable for repair despite having enough coins or being able to repair items despite not having enough coins and going into debt._
+* Added validation if config contains the same repairable item multiple times.
+</details>
+<details>
 <summary>2.0.1 </summary>
 
 * Added void coin support to Picker variant.
