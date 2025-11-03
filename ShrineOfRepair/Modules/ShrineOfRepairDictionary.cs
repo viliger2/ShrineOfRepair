@@ -65,13 +65,30 @@ namespace ShrineOfRepair.Modules
                     ItemIndex tofix = ItemCatalog.FindItemIndex(kv[1].Trim());
                     if (broken != ItemIndex.None && tofix != ItemIndex.None)
                     {
-                        RepairItemsDictionary.Add(broken, tofix);
-                        continue;
+                        if (RepairItemsDictionary.TryGetValue(broken, out var value))
+                        {
+                            Log.Warning($"Shrine Repair Dictionary already contains item {ItemCatalog.GetItemDef(broken)} that repairs into {ItemCatalog.GetItemDef(value)}. Skipping {kv[0]}->{kv[1]}");
+                        }
+                        else
+                        {
+                            RepairItemsDictionary.Add(broken, tofix);
+                            continue;
+                        }
                     }
                     EquipmentIndex broken2 = EquipmentCatalog.FindEquipmentIndex(kv[0].Trim());
                     EquipmentIndex tofix2 = EquipmentCatalog.FindEquipmentIndex(kv[1].Trim());
                     if (broken2 != EquipmentIndex.None && tofix2 != EquipmentIndex.None)
-                        RepairEquipmentsDictionary.Add(broken2, tofix2);
+                    {
+                        if (RepairEquipmentsDictionary.TryGetValue(broken2, out var value))
+                        {
+                            Log.Warning($"Shrine Repair Dictionary already contains equipment {EquipmentCatalog.GetEquipmentDef(broken2)} that repairs into {EquipmentCatalog.GetEquipmentDef(value)}. Skipping {kv[0]}->{kv[1]}");
+                        }
+                        else
+                        {
+                            RepairEquipmentsDictionary.Add(broken2, tofix2);
+                            continue;
+                        }
+                    }
                 }
             }
 

@@ -203,6 +203,10 @@ namespace ShrineOfRepair.Behaviours
                 case CostTypes.VoidCoin:
                     return master.voidCoins;
                 case CostTypes.LunarCoin:
+                    if (ModCompat.EphemeralCoinsCompat.enabled)
+                    {
+                        return ModCompat.EphemeralCoinsCompat.EphemeralCoinsCount(master.playerCharacterMasterController.networkUser);
+                    }
                     return master.playerCharacterMasterController.networkUser.lunarCoins;
             }
         }
