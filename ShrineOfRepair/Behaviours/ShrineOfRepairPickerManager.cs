@@ -43,7 +43,7 @@ namespace ShrineOfRepair.Behaviours
             }
         }
 
-        public void HandleSelection(int selection)
+        public void HandleSelection(UniquePickup selection)
         {
             if (!NetworkServer.active)
             {
@@ -54,10 +54,10 @@ namespace ShrineOfRepair.Behaviours
 
             if (interactor)
             {
-                PickupDef pickupDef = PickupCatalog.GetPickupDef(new PickupIndex(selection));
+                PickupDef pickupDef = PickupCatalog.GetPickupDef(selection.pickupIndex);
                 CharacterBody body = interactor.GetComponent<CharacterBody>();
                 var hasFreeUnlocks = body.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
-                int numberOfItems = body.inventory.GetItemCount(pickupDef.itemIndex);
+                int numberOfItems = body.inventory.GetItemCountPermanent(pickupDef.itemIndex);
 
                 // since broken items by default don't have tier
                 // we use our dictionary to get itemTier of non-broken item
@@ -76,8 +76,8 @@ namespace ShrineOfRepair.Behaviours
                     string pickupColorHex, pickupName, pickupAmountString;
                     if (isItem)
                     {
-                        body.inventory.RemoveItem(pickupDef.itemIndex, numberOfItems);
-                        body.inventory.GiveItem(itemIndex, numberOfItems);
+                        body.inventory.RemoveItemPermanent(pickupDef.itemIndex, numberOfItems);
+                        body.inventory.GiveItemPermanent(itemIndex, numberOfItems);
                         CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
 
                         pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
@@ -86,7 +86,7 @@ namespace ShrineOfRepair.Behaviours
                     }
                     else
                     {
-                        body.inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[pickupDef.equipmentIndex]);
+                        body.inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[pickupDef.equipmentIndex], true);
                         CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, pickupDef.equipmentIndex, ShrineOfRepairDictionary.RepairEquipmentsDictionary[pickupDef.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
 
                         pickupColorHex = ColorCatalog.GetColorHexString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).colorIndex);
@@ -153,13 +153,13 @@ namespace ShrineOfRepair.Behaviours
 
                 foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in ShrineOfRepairDictionary.RepairItemsDictionary)
                 {
-                    var itemCount = charBody.inventory.GetItemCount(pairedItems.Key);
+                    var itemCount = charBody.inventory.GetItemCountPermanent(pairedItems.Key);
                     if (itemCount > 0)
                     {
                         options.Add(new PickupPickerController.Option
                         {
                             available = currentCurrency >= GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount) || hasFreeUnlocks,
-                            pickupIndex = PickupCatalog.FindPickupIndex(pairedItems.Key)
+                            pickup = new UniquePickup(PickupCatalog.FindPickupIndex(pairedItems.Key))
                         });
                     }
                 }
@@ -168,7 +168,7 @@ namespace ShrineOfRepair.Behaviours
                     options.Add(new PickupPickerController.Option
                     {
                         available = currentCurrency >= GetEquipmentCost() || hasFreeUnlocks,
-                        pickupIndex = PickupCatalog.FindPickupIndex(charBody.equipmentSlot.equipmentIndex)
+                        pickup = new UniquePickup(PickupCatalog.FindPickupIndex(charBody.equipmentSlot.equipmentIndex))
                     });
                 }
 

@@ -16,14 +16,15 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
-		<PackageReference Include="Bubbet-BubbetsItems" Version="1.8.16" />
+		<PackageReference Include="Bubbet-BubbetsItems" Version="1.8.19" />
 		<PackageReference Include="prodzpod-Ephemeral_Coins" Version="2.3.6" />
-		<PackageReference Include="R2API.Director" Version="2.1.3" />
-		<PackageReference Include="R2API.Prefab" Version="1.0.4" />
+		<PackageReference Include="R2API.Director" Version="2.3.7" />
+		<PackageReference Include="R2API.Prefab" Version="1.1.1" />
 		<PackageReference Include="Rune580-Risk_Of_Options" Version="2.8.4" />
 		<PackageReference Include="UnityEngine.Modules" Version="2021.3.33" />
-		<PackageReference Include="MMHOOK.RoR2" Version="2025.3.4" />
-		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.3.7-r.0" />
+		<PackageReference Include="RiskOfRain2.GameLibs" Version="1.4.0-r.0" />
+		<PackageReference Include="MMHOOK.RoR2" Version="2025.11.19" NoWarn="NU1701" />
+		<PackageReference Include="RoR2BepInExPack" Version="1.37.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -93,7 +93,9 @@ namespace ShrineOfRepair.Modules
             }
 
             RepairItemsDictionary = ModExtension.FillItemDictionaryFromMods(RepairItemsDictionary);
+#pragma warning disable CS0618 // Type or member is obsolete
             RepairItemsDictionary = ModExtension.FillDictionaryFromMods(RepairItemsDictionary);
+#pragma warning restore CS0618 // Type or member is obsolete
             RepairEquipmentsDictionary = ModExtension.FillEquipmentDictionaryFromMods(RepairEquipmentsDictionary);
 #if DEBUG 
             Log.Debug("Items");

@@ -49,7 +49,7 @@ namespace ShrineOfRepair
                     bool isShrineAvailable = false;
 
                     foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in ShrineOfRepairDictionary.RepairItemsDictionary)
-                        if (body.inventory.GetItemCount(pairedItems.Key) > 0)
+                        if (body.inventory.GetItemCountPermanent(pairedItems.Key) > 0)
                             isShrineAvailable = true;
                     foreach (KeyValuePair<EquipmentIndex, EquipmentIndex> pairedItems in ShrineOfRepairDictionary.RepairEquipmentsDictionary)
                         if (body.equipmentSlot.equipmentIndex == pairedItems.Key)
@@ -71,7 +71,7 @@ namespace ShrineOfRepair
 
                     foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in ShrineOfRepairDictionary.RepairItemsDictionary)
                     {
-                        if (body.inventory.GetItemCount(pairedItems.Key) > 0)
+                        if (body.inventory.GetItemCountPermanent(pairedItems.Key) > 0)
                         {
                             isShrineAvailable = true;
                         }
@@ -129,8 +129,8 @@ namespace ShrineOfRepair
 
             var pickerController = prefab.AddComponent<PickupPickerController>();
             pickerController.panelPrefab = CreateRepairPickerPanel();
-            pickerController.onPickupSelected = new PickupPickerController.PickupIndexUnityEvent();
-            pickerController.onPickupSelected.AddPersistentListener(manager.HandleSelection);
+            pickerController.onUniquePickupSelected = new PickupPickerController.UniquePickupUnityEvent();
+            pickerController.onUniquePickupSelected.AddPersistentListener(manager.HandleSelection);
             pickerController.onServerInteractionBegin = new GenericInteraction.InteractorUnityEvent();
             pickerController.onServerInteractionBegin.AddPersistentListener(manager.HandleInteraction);
             pickerController.cutoffDistance = 10f;

@@ -66,7 +66,15 @@ namespace ShrineOfRepairRewrite.Behaviours
                         correspondingScrapImage.sprite = repairedItemDef.pickupIconSprite;
                         inspectPanelController.InspectTitle.token = repairedItemDef.nameToken;
                         inspectPanelController.InspectDescription.token = repairedItemDef.descriptionToken;
-                        inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(repairedItemDef.colorIndex);
+                        if (repairedItemDef._itemTierDef)
+                        {
+                            inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(repairedItemDef._itemTierDef.colorIndex);
+                        } else
+                        {
+#pragma warning disable CS0618 // Type or member is obsolete
+                            inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(repairedItemDef.colorIndex);
+#pragma warning restore CS0618 // Type or member is obsolete
+                        }
                     }
                 }
             } else
@@ -95,7 +103,7 @@ namespace ShrineOfRepairRewrite.Behaviours
             {
                 return;
             }
-            int itemCount = cachedBodyInventory.GetItemCount(pickupDef.itemIndex);
+            int itemCount = cachedBodyInventory.GetItemCountPermanent(pickupDef.itemIndex);
             TextMeshProUGUI textMeshProUGUI = button.GetComponent<ChildLocator>().FindChildComponent<TextMeshProUGUI>("Quantity");
             if ((bool)textMeshProUGUI)
             {
@@ -127,7 +135,7 @@ namespace ShrineOfRepairRewrite.Behaviours
 
             var hasFreeUnlocks = cachedBody.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
             bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex);
-            int count = cachedBodyInventory.GetItemCount(pickupDef.itemIndex);
+            int count = cachedBodyInventory.GetItemCountPermanent(pickupDef.itemIndex);
             ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
 
             GameObject textGameObject = new GameObject("CostText");

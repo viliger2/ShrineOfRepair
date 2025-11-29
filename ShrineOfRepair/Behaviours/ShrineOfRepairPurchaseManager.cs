@@ -27,7 +27,9 @@ namespace ShrineOfRepair.Behaviours
                 PurchaseInteraction.SetAvailable(true);
             }
 
-            PurchaseInteraction.onPurchase.AddListener(RepairPurchaseAttempt);
+            PurchaseInteraction.onDetailedPurchaseServer.AddListener(RepairPurchaseAttempt);
+
+            //PurchaseInteraction.onPurchase.AddListener(RepairPurchaseAttempt);
 
             if (PurchaseInteraction.costType == CostTypeIndex.Money)
             {
@@ -59,31 +61,30 @@ namespace ShrineOfRepair.Behaviours
         }
 
         [Server]
-        public void RepairPurchaseAttempt(Interactor interactor)
+        public void RepairPurchaseAttempt(CostTypeDef.PayCostContext context, CostTypeDef.PayCostResults result)
         {
             if (!NetworkServer.active)
             {
                 return;
             }
 
-            if (!interactor) { return; }
-            var body = interactor.GetComponent<CharacterBody>();
+            var body = context.activatorBody;
             if (body && body.master)
             {
                 var inventory = body.inventory;
                 foreach (KeyValuePair<ItemIndex, ItemIndex> pairedItems in ShrineOfRepairDictionary.RepairItemsDictionary)
                 {
-                    int numberOfItems = inventory.GetItemCount(pairedItems.Key);
+                    int numberOfItems = inventory.GetItemCountPermanent(pairedItems.Key);
                     if (numberOfItems > 0)
                     {
-                        inventory.RemoveItem(pairedItems.Key, numberOfItems);
-                        inventory.GiveItem(pairedItems.Value, numberOfItems);
+                        inventory.RemoveItemPermanent(pairedItems.Key, numberOfItems);
+                        inventory.GiveItemPermanent(pairedItems.Value, numberOfItems);
                         CharacterMasterNotificationQueue.SendTransformNotification(body.master, pairedItems.Key, pairedItems.Value, CharacterMasterNotificationQueue.TransformationType.Default);
                     }
                 }
                 if (ShrineOfRepairDictionary.RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex))
                 {
-                    inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex]);
+                    inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], true);
                     CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, body.equipmentSlot.equipmentIndex, ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
                 }
 
@@ -104,7 +105,7 @@ namespace ShrineOfRepair.Behaviours
 
                 Chat.SendBroadcastChat(new Chat.SubjectFormatChatMessage
                 {
-                    subjectAsCharacterBody = interactor.GetComponent<CharacterBody>(),
+                    subjectAsCharacterBody = context.activatorBody,
                     baseToken = "INTERACTABLE_SHRINE_REPAIR_INTERACT"
                 });
 
