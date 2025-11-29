@@ -1,4 +1,15 @@
 <details>
+<summary>2.1.0 </summary>
+
+* Recompiled for AC.
+* Added ability to repair temporary items.
+  * Prices are equal to that of their respective chest. Lunar uses large chest, boss uses double of large chest. Void items use their respective tier price.
+* A few known issues (which most likely won't get fixed until shrine breaks again):
+  * Temporary item indicator (blue circle) doesn't disappear on repair. It doesn't tick down, but will stay until you pick another of the same item, you shift your inventory display (as in item will be now in a new place in the display) or advance to a next stage.
+  * Shrine icon doesn't disappear on clients when shrine is out of uses.
+  * Prices are shown incorrectly on clients, however icons are appropriately locked if user doesn't have enough currency to proceed with purchase.
+</details>
+<details>
 <summary>2.0.2 </summary>
 
 * Added [Ephemeral Coins](https://thunderstore.io/package/prodzpod/Ephemeral_Coins/) compat.

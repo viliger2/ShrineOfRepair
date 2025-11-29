@@ -2,14 +2,14 @@
 ![Shrine Screenshot](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/screenshot.jpg)
 
 ## Current version
-Risk of Rain 2 mod, adds a shrine to repair broken items. Features scrapper-like UI for selecting which item to repair, showing price per stack. 
+Risk of Rain 2 mod, adds a shrine to repair broken, void and temporary items. Features scrapper-like UI for selecting which item to repair, showing price per stack. 
 ![GUI Screenshot](https://raw.githubusercontent.com/viliger2/ShrineOfRepair/main/images/scrapper_ui.jpg)
-Price scales with time, starting price equals to half of the equal chest price. Starting price is customizable. Config files are not separated into 3 categories:
+Price scales with time, prices depend on tier and type of item. Starting price is customizable. Config files are not separated into 3 categories:
 * General behavior where you setup model, interactable type and director rules
 * AllInOne where you change pre-1.2.0 variant settings, like price and scaling
 * PerItem where you chance base prices of each item tier.
 
-Blacklist is now replaced with Repair List, a list that allows users to create their own pairs of BrokenItem - RepairedItem, including those from mods. By default list is filled with vanilla items, pairs can be removed as a form of blacklist.
+Comes with Repair List, a list that allows users to create their own pairs of BrokenItem - RepairedItem, including those from mods. By default list is filled with vanilla items, pairs can be removed as a form of blacklist.
 
 Shrine can be spawned in the Bazaar in Time and Commencement via config, and price will be converted to Lunar Coins (rate and Commencement currency configurable).
 
