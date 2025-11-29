@@ -15,7 +15,7 @@ namespace ShrineOfRepair
     {
         public const string Author = "Viliger";
         public const string ModName = "ShrineOfRepair";
-        public const string Version = "2.0.2";
+        public const string Version = "2.1.0";
         public const string GUID = "com." + Author + "." + ModName;
 
         public const string LanguageFolder = "Language";

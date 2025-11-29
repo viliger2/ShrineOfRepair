@@ -1,9 +1,12 @@
-﻿using RoR2;
+﻿using HarmonyLib;
+using HG;
+using RoR2;
 using ShrineOfRepair;
 using ShrineOfRepair.ModCompat;
 using ShrineOfRepair.Modules;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -58,31 +61,53 @@ namespace ShrineOfRepair.Behaviours
                 CharacterBody body = interactor.GetComponent<CharacterBody>();
                 var hasFreeUnlocks = body.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
                 int numberOfItems = body.inventory.GetItemCountPermanent(pickupDef.itemIndex);
+                int numberTempItems = ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value ? body.inventory.GetItemCountTemp(pickupDef.itemIndex) : 0;
 
                 // since broken items by default don't have tier
                 // we use our dictionary to get itemTier of non-broken item
-                bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex);
-                ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
+                bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex) || numberTempItems > 0;
+                ItemTier tier;
+                if (numberTempItems > 0)
+                {
+                    tier = ItemCatalog.GetItemDef(pickupDef.itemIndex).tier;
+                                 
+                }
+                else
+                {
+                    tier = ItemCatalog.GetItemDef(itemIndex).tier;
+                }
 
                 if (isItem || ShrineOfRepairDictionary.RepairEquipmentsDictionary.ContainsKey(pickupDef.equipmentIndex))
                 {
-                    uint cost = isItem ? GetTotalStackCost(tier, numberOfItems) : GetEquipmentCost();
+                    uint cost = isItem ? GetTotalStackCost(tier, numberOfItems, numberTempItems) : GetEquipmentCost();
                     if (cost > GetCurrentCurrencyValue(body.master) && !hasFreeUnlocks)
                     {
                         Log.Warning(string.Format("Somehow player {0} ({1}) has less currency than price of {2}x{3}, yet it was available at the start of interaction. Doing nothing...", body.GetUserName(), body.name, pickupDef.nameToken, numberOfItems));
                         return;
                     }
 
-                    string pickupColorHex, pickupName, pickupAmountString;
+                    string pickupColorHex = "", pickupName = "", pickupAmountString = "";
                     if (isItem)
                     {
-                        body.inventory.RemoveItemPermanent(pickupDef.itemIndex, numberOfItems);
-                        body.inventory.GiveItemPermanent(itemIndex, numberOfItems);
-                        CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                        if (numberOfItems > 0)
+                        {
+                            body.inventory.RemoveItemPermanent(pickupDef.itemIndex, numberOfItems);
+                            body.inventory.GiveItemPermanent(itemIndex, numberOfItems);
+                            CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
 
-                        pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
-                        pickupName = Language.GetString(ItemCatalog.GetItemDef(itemIndex).nameToken);
-                        pickupAmountString = numberOfItems == 1 ? "" : "<style=\"cEvent\">(" + numberOfItems + ")</style>";
+                            pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
+                            pickupName = Language.GetString(ItemCatalog.GetItemDef(itemIndex).nameToken);
+                            pickupAmountString = numberOfItems == 1 ? "" : "<style=\"cEvent\">(" + numberOfItems + ")</style>";
+                        } else if(numberTempItems > 0)
+                        {
+                            body.inventory.GiveItemPermanent(pickupDef.itemIndex, numberTempItems);
+                            body.inventory.RemoveItemTemp(pickupDef.itemIndex, numberTempItems);
+                            CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, pickupDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+
+                            pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
+                            pickupName = Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken);
+                            pickupAmountString = numberTempItems == 1 ? "" : "<style=\"cEvent\">(" + numberTempItems + ")</style>";
+                        }
                     }
                     else
                     {
@@ -158,7 +183,7 @@ namespace ShrineOfRepair.Behaviours
                     {
                         options.Add(new PickupPickerController.Option
                         {
-                            available = currentCurrency >= GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount) || hasFreeUnlocks,
+                            available = currentCurrency >= GetTotalStackCost(ItemCatalog.GetItemDef(pairedItems.Value).tier, itemCount, 0) || hasFreeUnlocks,
                             pickup = new UniquePickup(PickupCatalog.FindPickupIndex(pairedItems.Key))
                         });
                     }
@@ -170,6 +195,26 @@ namespace ShrineOfRepair.Behaviours
                         available = currentCurrency >= GetEquipmentCost() || hasFreeUnlocks,
                         pickup = new UniquePickup(PickupCatalog.FindPickupIndex(charBody.equipmentSlot.equipmentIndex))
                     });
+                }
+
+                if(charBody.inventory.GetTotalTempItemCount() > 0 && ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value)
+                {
+                    using (CollectionPool<ItemIndex, List<ItemIndex>>.RentCollection(out var list))
+                    {
+                        charBody.inventory.tempItemsStorage.tempItemStacks.GetNonZeroIndices(list);
+                        foreach (var itemIndex in list)
+                        {
+                            var count = charBody.inventory.tempItemsStorage.tempItemStacks.GetStackValue(itemIndex);
+                            if (count > 0)
+                            {
+                                options.Add(new PickupPickerController.Option
+                                {
+                                    available = currentCurrency > GetTotalStackCost(ItemCatalog.GetItemDef(itemIndex).tier, 0, count) || hasFreeUnlocks,
+                                    pickup = new UniquePickup(PickupCatalog.FindPickupIndex(itemIndex))
+                                });
+                            }
+                        }
+                    }
                 }
 
                 pickerController.SetOptionsServer(options.ToArray());
@@ -211,15 +256,27 @@ namespace ShrineOfRepair.Behaviours
             }
         }
 
-        public uint GetTotalStackCost(ItemTier tier, int numberOfItems)
+        public uint GetTotalStackCost(ItemTier tier, int numberPermitems, int numberTempItems)
         {
-            if (GetCostFromItemTier(tier) <= 0)
+            var costFromTier = 0;
+            var numberOfItems = 0;
+            if(numberPermitems > 0)
+            {
+                costFromTier = GetCostFromItemTier(tier);
+                numberOfItems = numberPermitems;
+            } else if(numberTempItems > 0)
+            {
+                costFromTier = GetTempCostFromItemTier(tier);
+                numberOfItems = numberTempItems;
+            }
+
+            if(costFromTier == 0)
             {
                 return 0;
             }
 
-            var costInGoldBeforeScaling = (uint)(GetCostFromItemTier(tier) * numberOfItems);
-            if(costInGoldBeforeScaling <= 0)
+            var costInGoldBeforeScaling = costFromTier * numberOfItems;
+            if (costInGoldBeforeScaling <= 0)
             {
                 costInGoldBeforeScaling = 1;
             }
@@ -233,6 +290,7 @@ namespace ShrineOfRepair.Behaviours
                 case CostTypes.LunarCoin:
                     return (uint)Mathf.Max((costInGoldBeforeScaling * PickerLunarCoinMultiplier.Value), 1);
             }
+            return 0;
         }
 
         public uint GetEquipmentCost()
@@ -279,6 +337,29 @@ namespace ShrineOfRepair.Behaviours
                     return PickerPanelGoldBossCost.Value;
                 case ItemTier.Lunar:
                     return PickerPanelGoldLunarCost.Value;
+            }
+        }
+
+        private int GetTempCostFromItemTier(ItemTier tier)
+        {
+            if (BubbetItemsCompat.enabled && BubbetItemsCompat.IsVoidLunar(tier)) return PickerPanelGoldTempLunarCost.Value;
+            switch (tier)
+            {
+                case ItemTier.Tier1:
+                case ItemTier.VoidTier1:
+                    return PickerPanelGoldTempTier1Cost.Value;
+                case ItemTier.Tier2:
+                case ItemTier.VoidTier2:
+                default:
+                    return PickerPanelGoldTempTier2Cost.Value;
+                case ItemTier.Tier3:
+                case ItemTier.VoidTier3:
+                    return PickerPanelGoldTempTier3Cost.Value;
+                case ItemTier.Boss:
+                case ItemTier.VoidBoss:
+                    return PickerPanelGoldTempTierBossCost.Value;
+                case ItemTier.Lunar:
+                    return PickerPanelGoldTempLunarCost.Value;
             }
         }
 

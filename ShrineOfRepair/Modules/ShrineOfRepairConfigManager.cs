@@ -34,6 +34,7 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<Vector3> Moon2Angle;
 
         public static ConfigEntry<bool> RepairVoidItems;
+        public static ConfigEntry<bool> RepairTempItems;
 
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
@@ -56,6 +57,12 @@ namespace ShrineOfRepair.Modules
         public static ConfigEntry<int> PickerPanelGoldBossCost;
         public static ConfigEntry<int> PickerPanelGoldLunarCost;
         public static ConfigEntry<int> PickerPanelGoldEquipCost;
+
+        public static ConfigEntry<int> PickerPanelGoldTempTier1Cost;
+        public static ConfigEntry<int> PickerPanelGoldTempTier2Cost;
+        public static ConfigEntry<int> PickerPanelGoldTempTier3Cost;
+        public static ConfigEntry<int> PickerPanelGoldTempTierBossCost;
+        public static ConfigEntry<int> PickerPanelGoldTempLunarCost;
 
         public static ConfigEntry<bool> BazaarUseLunar;
         public static ConfigEntry<float> PickerLunarCoinMultiplier;
@@ -102,6 +109,8 @@ namespace ShrineOfRepair.Modules
 
             RepairVoidItems = mainConfig.Bind("Void Items", "Repair Void Items", true, "Enables the ability to repair void items back into their normal versions. If void item has multiple normal versions then it is skipped (like VoidRing or VoidBossItem). Items are filled dynamically from list of contagious items, so you don't need to fill the dictionary manually like with other breakable items.");
 
+            RepairTempItems = mainConfig.Bind("Temp Items", "Repair Temp Items", true, "Enables the ability to repair temporary items. Repair items use their own gold cost values, usually equal to that of their respective chest.");
+
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 
             PurchaseInteractionCurrencyType = allInOneConfig.Bind("Currency", "Currency Type", CostTypes.Gold, "Type of currency used to purchase shrine. Using anything other than \"Gold\" disables price scaling over time. Each currency has its own options.");
@@ -126,6 +135,12 @@ namespace ShrineOfRepair.Modules
             PickerPanelGoldBossCost = perItemConfig.Bind("Per Item Repairs", "Boss cost", 50, "Base cost of boss (yellow) item repair. By default the cost is equal to double tier 2 repair price.");
             PickerPanelGoldLunarCost = perItemConfig.Bind("Per Item Repairs", "Lunar cost", 25, "Base cost of lunar (blue) item repair. By default the cost is equal to the half of large chest price.");
             PickerPanelGoldEquipCost = perItemConfig.Bind("Per Item Repairs", "Equipment cost", 50, "Base cost of equipments (orange) repair. By default the cost is equal to double tier 2 repair price.");
+
+            PickerPanelGoldTempTier1Cost = perItemConfig.Bind("Temp Items", "Tier 1 cost", 25, "Base cost of temporary tier 1 (white) item repair. By default the cost is equal to the normal chest price.");
+            PickerPanelGoldTempTier2Cost = perItemConfig.Bind("Temp Items", "Tier 2 cost", 50, "Base cost of temporary tier 2 (green) item repair. By default the cost is equal to the large chest price.");
+            PickerPanelGoldTempTier3Cost = perItemConfig.Bind("Temp Items", "Tier 3 cost", 400, "Base cost of temporary tier 3 (red) item repair. By default the cost is equal to the legenrady chest price.");
+            PickerPanelGoldTempTierBossCost = perItemConfig.Bind("Temp Items", "Boss Tier cost", 100, "Base cost of temporary boss tier (yellow) item repair. By default the cost is equal to the double large chest price.");
+            PickerPanelGoldTempLunarCost = perItemConfig.Bind("Temp Items", "Lunar Tier Cost", 50, "Base cost of temporary lunar (blue) item repair. By default the cost is equal to thelarge chest price.");
 
             BazaarUseLunar = perItemConfig.Bind("Bazaar Shrines", "Use Lunar Coins in Bazaar", true, "Shrine spawned in Bazaar uses lunar coins. If disabled it will use gold instead.");
 

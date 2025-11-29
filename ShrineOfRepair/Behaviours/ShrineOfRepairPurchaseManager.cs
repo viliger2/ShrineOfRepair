@@ -1,10 +1,12 @@
-﻿using RoR2;
+﻿using HG;
+using RoR2;
 using ShrineOfRepair.Modules;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using static Rewired.InputMapper;
 using static ShrineOfRepair.Modules.ShrineOfRepairConfigManager;
 
 namespace ShrineOfRepair.Behaviours
@@ -28,8 +30,6 @@ namespace ShrineOfRepair.Behaviours
             }
 
             PurchaseInteraction.onDetailedPurchaseServer.AddListener(RepairPurchaseAttempt);
-
-            //PurchaseInteraction.onPurchase.AddListener(RepairPurchaseAttempt);
 
             if (PurchaseInteraction.costType == CostTypeIndex.Money)
             {
@@ -86,6 +86,24 @@ namespace ShrineOfRepair.Behaviours
                 {
                     inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], true);
                     CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, body.equipmentSlot.equipmentIndex, ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
+                }
+
+                if (inventory.GetTotalTempItemCount() > 0 && ShrineOfRepairConfigManager.RepairTempItems.Value)
+                {
+                    using (CollectionPool<ItemIndex, List<ItemIndex>>.RentCollection(out var list))
+                    {
+                        inventory.tempItemsStorage.tempItemStacks.GetNonZeroIndices(list);
+                        foreach (var itemIndex in list)
+                        {
+                            var count = inventory.tempItemsStorage.tempItemStacks.GetStackValue(itemIndex);
+                            if (count > 0)
+                            {
+                                inventory.GiveItemPermanent(itemIndex, count);
+                                inventory.RemoveItemTemp(itemIndex, count);
+                                CharacterMasterNotificationQueue.SendTransformNotification(body.master, itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                            }
+                        }
+                    }
                 }
 
                 EffectManager.SpawnEffect(Resources.Load<GameObject>("Prefabs/Effects/ShrineUseEffect"), new EffectData()

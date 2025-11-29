@@ -54,6 +54,10 @@ namespace ShrineOfRepair
                     foreach (KeyValuePair<EquipmentIndex, EquipmentIndex> pairedItems in ShrineOfRepairDictionary.RepairEquipmentsDictionary)
                         if (body.equipmentSlot.equipmentIndex == pairedItems.Key)
                             isShrineAvailable = true;
+                    if(body.inventory.GetTotalTempItemCount() > 0 && ShrineOfRepairConfigManager.RepairTempItems.Value)
+                    {
+                        isShrineAvailable = true;
+                    }
                     if (!isShrineAvailable) { return Interactability.ConditionsNotMet; }
                 }
             }
@@ -77,6 +81,10 @@ namespace ShrineOfRepair
                         }
                     }
                     if (ShrineOfRepairDictionary.RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex)) isShrineAvailable = true;
+                    if (body.inventory.GetTotalTempItemCount() > 0 && ShrineOfRepairConfigManager.RepairTempItems.Value)
+                    {
+                        isShrineAvailable = true;
+                    }
                     if (!isShrineAvailable) { return Interactability.ConditionsNotMet; }
                 }
             }

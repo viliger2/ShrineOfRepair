@@ -58,7 +58,22 @@ namespace ShrineOfRepairRewrite.Behaviours
 
             if (itemDef != default(ItemDef))
             {
-                if (ShrineOfRepair.Modules.ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(itemDef.itemIndex, out var repairedItemIndex))
+                if(cachedBodyInventory.GetItemCountTemp(itemDef.itemIndex) > 0 && ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value)
+                {
+                    correspondingScrapImage.sprite = itemDef.pickupIconSprite;
+                    inspectPanelController.InspectTitle.token = itemDef.nameToken;
+                    inspectPanelController.InspectDescription.token = itemDef.descriptionToken;
+                    if (itemDef._itemTierDef)
+                    {
+                        inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(itemDef._itemTierDef.colorIndex);
+                    }
+                    else
+                    {
+#pragma warning disable CS0618 // Type or member is obsolete
+                        inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(itemDef.colorIndex);
+#pragma warning restore CS0618 // Type or member is obsolete
+                    }
+                } else if (ShrineOfRepair.Modules.ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(itemDef.itemIndex, out var repairedItemIndex))
                 {
                     var repairedItemDef = ItemCatalog.GetItemDef(repairedItemIndex);
                     if (repairedItemDef != default(ItemDef))
@@ -134,7 +149,8 @@ namespace ShrineOfRepairRewrite.Behaviours
             }
 
             var hasFreeUnlocks = cachedBody.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
-            bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex);
+            int countTemp = ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value ? cachedBodyInventory.GetItemCountTemp(pickupDef.itemIndex) : 0;
+            bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex) || countTemp > 0;
             int count = cachedBodyInventory.GetItemCountPermanent(pickupDef.itemIndex);
             ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
 
@@ -156,7 +172,7 @@ namespace ShrineOfRepairRewrite.Behaviours
             }
             else
             {
-                counterText.text = GetCurrencyText(manager.costType) + (isItem ? manager.GetTotalStackCost(tier, count) : manager.GetEquipmentCost());
+                counterText.text = GetCurrencyText(manager.costType) + (isItem ? manager.GetTotalStackCost(tier, count, countTemp) : manager.GetEquipmentCost());
             }
 
             counterRect.localPosition = Vector3.zero;
