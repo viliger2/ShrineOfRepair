@@ -1,6 +1,6 @@
 {
     "name": "ShrineOfRepair",
-    "version_number": "2.1.0",
+    "version_number": "2.1.1",
     "website_url": "https://github.com/viliger2/ShrineOfRepair",
     "description": "Shrine to repair your broken items. Fixed for AC with ability to repair temp items.",
     "dependencies": [

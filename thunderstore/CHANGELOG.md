@@ -1,4 +1,8 @@
 <details>
+<summary>2.1.1 </summary>
+
+* Added zh-CN translation by [君菌w](https://github.com/JunJun5406)
+<details>
 <summary>2.1.0 </summary>
 
 * Recompiled for AC.

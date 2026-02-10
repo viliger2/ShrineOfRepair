@@ -46,6 +46,9 @@
 		<None Update="Language\ru\ShrineOfRepair_ru.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="Language\zh-CN\ShrineOfRepair_zh-CN.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
