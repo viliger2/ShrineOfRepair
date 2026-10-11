@@ -3,6 +3,8 @@ using RoR2.UI;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 
 namespace ShrineOfRepair
@@ -32,5 +34,45 @@ namespace ShrineOfRepair
                 m_Mode = PersistentListenerMode.EventDefined,
             });
         }
+
+        public static Sprite GetIconSprite(this ItemDef itemDef)
+        { 
+            if(itemDef.pickupIconSpriteReference != null && itemDef.pickupIconSpriteReference.RuntimeKeyIsValid())
+#pragma warning disable CS0618 // Type or member is obsolete
+            {
+                return Addressables.LoadAssetAsync<Sprite>(itemDef.pickupIconSpriteReference.AssetGUID).WaitForCompletion();
+            } else if(itemDef.pickupIconSprite != null)
+            {
+                return itemDef.pickupIconSprite;
+            } else
+            {
+                return null;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        public static Sprite GetIconSprite(this EquipmentDef itemDef)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (itemDef.pickupIconSpriteReference != null && itemDef.pickupIconSpriteReference.RuntimeKeyIsValid())
+            {
+                return Addressables.LoadAssetAsync<Sprite>(itemDef.pickupIconSpriteReference.AssetGUID).WaitForCompletion();
+            }
+            else if (itemDef.pickupIconSprite != null)
+            {
+                return itemDef.pickupIconSprite;
+            }
+            else
+            {
+                return null;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        public static int GetTotalRentedItemCount(this Inventory inventory)
+        {
+            return inventory.rentalItemStacks.GetTotalItemStacks();
+        }
+
     }
 }

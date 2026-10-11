@@ -62,12 +62,13 @@ namespace ShrineOfRepair.Behaviours
                 var hasFreeUnlocks = body.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
                 int numberOfItems = body.inventory.GetItemCountPermanent(pickupDef.itemIndex);
                 int numberTempItems = ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value ? body.inventory.GetItemCountTemp(pickupDef.itemIndex) : 0;
+                int numberRentedItems = RepairRentedItems.Value ? body.inventory.GetItemCountRented(pickupDef.itemIndex) : 0;
 
                 // since broken items by default don't have tier
                 // we use our dictionary to get itemTier of non-broken item
                 bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex) || numberTempItems > 0;
                 ItemTier tier;
-                if (numberTempItems > 0)
+                if (numberTempItems > 0 || numberRentedItems > 0)
                 {
                     tier = ItemCatalog.GetItemDef(pickupDef.itemIndex).tier;
                                  
@@ -107,11 +108,21 @@ namespace ShrineOfRepair.Behaviours
                             pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
                             pickupName = Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken);
                             pickupAmountString = numberTempItems == 1 ? "" : "<style=\"cEvent\">(" + numberTempItems + ")</style>";
+                        } else if (numberRentedItems > 0)
+                        {
+                            body.inventory.GiveItemPermanent(pickupDef.itemIndex, numberRentedItems);
+                            body.inventory.RemoveItemRented(pickupDef.itemIndex, numberRentedItems);
+                            CharacterMasterNotificationQueue.SendTransformNotification(body.master, pickupDef.itemIndex, pickupDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+
+                            pickupColorHex = ColorCatalog.GetColorHexString(ItemTierCatalog.GetItemTierDef(tier).colorIndex);
+                            pickupName = Language.GetString(ItemCatalog.GetItemDef(pickupDef.itemIndex).nameToken);
+                            pickupAmountString = numberRentedItems == 1 ? "" : "<style=\"cEvent\">(" + numberRentedItems + ")</style>";
                         }
                     }
                     else
                     {
-                        body.inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[pickupDef.equipmentIndex], true);
+                        var location = body.inventory.FindBestEquipmentLocationOrCurrent(in Inventory.EquipmentLocationQueryArgs.defaultPickup);
+                        body.inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[pickupDef.equipmentIndex], location);
                         CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, pickupDef.equipmentIndex, ShrineOfRepairDictionary.RepairEquipmentsDictionary[pickupDef.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
 
                         pickupColorHex = ColorCatalog.GetColorHexString(EquipmentCatalog.GetEquipmentDef(pickupDef.equipmentIndex).colorIndex);
@@ -205,6 +216,25 @@ namespace ShrineOfRepair.Behaviours
                         foreach (var itemIndex in list)
                         {
                             var count = charBody.inventory.tempItemsStorage.tempItemStacks.GetStackValue(itemIndex);
+                            if (count > 0)
+                            {
+                                options.Add(new PickupPickerController.Option
+                                {
+                                    available = currentCurrency > GetTotalStackCost(ItemCatalog.GetItemDef(itemIndex).tier, 0, count) || hasFreeUnlocks,
+                                    pickup = new UniquePickup(PickupCatalog.FindPickupIndex(itemIndex))
+                                });
+                            }
+                        }
+                    }
+                }
+                if(charBody.inventory.GetTotalRentedItemCount() > 0 && ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairRentedItems.Value)
+                {
+                    using (CollectionPool<ItemIndex, List<ItemIndex>>.RentCollection(out var list))
+                    {
+                        charBody.inventory.rentalItemStacks.GetNonZeroIndices(list);
+                        foreach(var itemIndex in list)
+                        {
+                            var count = charBody.inventory.rentalItemStacks.GetStackValue(itemIndex);
                             if (count > 0)
                             {
                                 options.Add(new PickupPickerController.Option

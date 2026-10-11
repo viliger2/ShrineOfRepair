@@ -1,12 +1,12 @@
 {
     "name": "ShrineOfRepair",
-    "version_number": "2.1.1",
+    "version_number": "2.1.2",
     "website_url": "https://github.com/viliger2/ShrineOfRepair",
     "description": "Shrine to repair your broken items. Fixed for AC with ability to repair temp items.",
     "dependencies": [
-	    "bbepis-BepInExPack-5.4.2102",
+	    "bbepis-BepInExPack-5.4.2122",
 		"RiskofThunder-R2API_Prefab-1.1.1",
-		"RiskofThunder-R2API_Director-2.3.7",
-		"RiskofThunder-HookGenPatcher-1.2.3"
+		"RiskofThunder-R2API_Director-3.1.1",
+		"RiskofThunder-HookGenPatcher-1.2.9"
     ]
 }

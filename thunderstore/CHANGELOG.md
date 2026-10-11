@@ -1,7 +1,15 @@
 <details>
+<summary>2.1.2 </summary>
+
+* Recompiled for HC.
+* Added ability to repair Ethereal items.
+  * _Follows the same rules as temporary items._
+</details>
+<details>
 <summary>2.1.1 </summary>
 
 * Added zh-CN translation by [君菌w](https://github.com/JunJun5406)
+</details>
 <details>
 <summary>2.1.0 </summary>
 

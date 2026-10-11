@@ -35,6 +35,7 @@ namespace ShrineOfRepair.Modules
 
         public static ConfigEntry<bool> RepairVoidItems;
         public static ConfigEntry<bool> RepairTempItems;
+        public static ConfigEntry<bool> RepairRentedItems;
 
         // for PurchaseInteraction
         public static ConfigEntry<CostTypes> PurchaseInteractionCurrencyType;
@@ -110,6 +111,7 @@ namespace ShrineOfRepair.Modules
             RepairVoidItems = mainConfig.Bind("Void Items", "Repair Void Items", true, "Enables the ability to repair void items back into their normal versions. If void item has multiple normal versions then it is skipped (like VoidRing or VoidBossItem). Items are filled dynamically from list of contagious items, so you don't need to fill the dictionary manually like with other breakable items.");
 
             RepairTempItems = mainConfig.Bind("Temp Items", "Repair Temp Items", true, "Enables the ability to repair temporary items. Repair items use their own gold cost values, usually equal to that of their respective chest.");
+            RepairRentedItems = mainConfig.Bind("Ethereal Items", "Repair Ethereal Items", true, "Enables the ability to repair ethereal items. Repair items use their own gold cost values, usually equal to that of their respective chest.");
 
             var allInOneConfig = new ConfigFile(Path.Combine(configPath, "viliger-ShrineOfRepair-AllInOne.cfg"), true);
 

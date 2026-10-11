@@ -58,6 +58,10 @@ namespace ShrineOfRepair
                     {
                         isShrineAvailable = true;
                     }
+                    if(body.inventory.GetTotalRentedItemCount() > 0 && ShrineOfRepairConfigManager.RepairRentedItems.Value)
+                    {
+                        isShrineAvailable = true;
+                    }
                     if (!isShrineAvailable) { return Interactability.ConditionsNotMet; }
                 }
             }
@@ -82,6 +86,10 @@ namespace ShrineOfRepair
                     }
                     if (ShrineOfRepairDictionary.RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex)) isShrineAvailable = true;
                     if (body.inventory.GetTotalTempItemCount() > 0 && ShrineOfRepairConfigManager.RepairTempItems.Value)
+                    {
+                        isShrineAvailable = true;
+                    }
+                    if (body.inventory.GetTotalRentedItemCount() > 0 && ShrineOfRepairConfigManager.RepairRentedItems.Value)
                     {
                         isShrineAvailable = true;
                     }

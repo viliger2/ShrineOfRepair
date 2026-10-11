@@ -84,7 +84,8 @@ namespace ShrineOfRepair.Behaviours
                 }
                 if (ShrineOfRepairDictionary.RepairEquipmentsDictionary.ContainsKey(body.equipmentSlot.equipmentIndex))
                 {
-                    inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], true);
+                    var location = inventory.FindBestEquipmentLocationOrCurrent(in Inventory.EquipmentLocationQueryArgs.defaultPickup);
+                    inventory.SetEquipmentIndex(ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], location);
                     CharacterMasterNotificationQueue.PushEquipmentTransformNotification(body.master, body.equipmentSlot.equipmentIndex, ShrineOfRepairDictionary.RepairEquipmentsDictionary[body.equipmentSlot.equipmentIndex], CharacterMasterNotificationQueue.TransformationType.Default);
                 }
 
@@ -93,6 +94,24 @@ namespace ShrineOfRepair.Behaviours
                     using (CollectionPool<ItemIndex, List<ItemIndex>>.RentCollection(out var list))
                     {
                         inventory.tempItemsStorage.tempItemStacks.GetNonZeroIndices(list);
+                        foreach (var itemIndex in list)
+                        {
+                            var count = inventory.tempItemsStorage.tempItemStacks.GetStackValue(itemIndex);
+                            if (count > 0)
+                            {
+                                inventory.GiveItemPermanent(itemIndex, count);
+                                inventory.RemoveItemTemp(itemIndex, count);
+                                CharacterMasterNotificationQueue.SendTransformNotification(body.master, itemIndex, itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                            }
+                        }
+                    }
+                }
+
+                if(inventory.GetTotalRentedItemCount() > 0 && RepairRentedItems.Value)
+                {
+                    using (CollectionPool<ItemIndex, List<ItemIndex>>.RentCollection(out var list))
+                    {
+                        inventory.rentalItemStacks.GetNonZeroIndices(list);
                         foreach (var itemIndex in list)
                         {
                             var count = inventory.tempItemsStorage.tempItemStacks.GetStackValue(itemIndex);

@@ -1,5 +1,6 @@
 ﻿using RoR2;
 using RoR2.UI;
+using ShrineOfRepair;
 using ShrineOfRepair.Modules;
 using System;
 using System.Collections.Generic;
@@ -58,9 +59,10 @@ namespace ShrineOfRepairRewrite.Behaviours
 
             if (itemDef != default(ItemDef))
             {
-                if(cachedBodyInventory.GetItemCountTemp(itemDef.itemIndex) > 0 && ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value)
+                if((cachedBodyInventory.GetItemCountTemp(itemDef.itemIndex) > 0 && ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value)
+                    || (cachedBodyInventory.GetItemCountRented(itemDef.itemIndex) > 0 && ShrineOfRepairConfigManager.RepairRentedItems.Value))
                 {
-                    correspondingScrapImage.sprite = itemDef.pickupIconSprite;
+                    correspondingScrapImage.sprite = itemDef.GetIconSprite();
                     inspectPanelController.InspectTitle.token = itemDef.nameToken;
                     inspectPanelController.InspectDescription.token = itemDef.descriptionToken;
                     if (itemDef._itemTierDef)
@@ -73,12 +75,13 @@ namespace ShrineOfRepairRewrite.Behaviours
                         inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(itemDef.colorIndex);
 #pragma warning restore CS0618 // Type or member is obsolete
                     }
-                } else if (ShrineOfRepair.Modules.ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(itemDef.itemIndex, out var repairedItemIndex))
+                }
+                else if (ShrineOfRepair.Modules.ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(itemDef.itemIndex, out var repairedItemIndex))
                 {
                     var repairedItemDef = ItemCatalog.GetItemDef(repairedItemIndex);
                     if (repairedItemDef != default(ItemDef))
                     {
-                        correspondingScrapImage.sprite = repairedItemDef.pickupIconSprite;
+                        correspondingScrapImage.sprite = repairedItemDef.GetIconSprite();
                         inspectPanelController.InspectTitle.token = repairedItemDef.nameToken;
                         inspectPanelController.InspectDescription.token = repairedItemDef.descriptionToken;
                         if (repairedItemDef._itemTierDef)
@@ -102,7 +105,7 @@ namespace ShrineOfRepairRewrite.Behaviours
                         var repairedEquipmentDef = EquipmentCatalog.GetEquipmentDef(repairedEquipmentIndex);
                         if (repairedEquipmentDef != default(EquipmentDef))
                         {
-                            correspondingScrapImage.sprite = repairedEquipmentDef.pickupIconSprite;
+                            correspondingScrapImage.sprite = repairedEquipmentDef.GetIconSprite();
                             inspectPanelController.InspectTitle.token = repairedEquipmentDef.nameToken;
                             inspectPanelController.InspectDescription.token = repairedEquipmentDef.descriptionToken;
                             inspectPanelController.InspectTitleText.color = ColorCatalog.GetColor(repairedEquipmentDef.colorIndex);
@@ -150,6 +153,7 @@ namespace ShrineOfRepairRewrite.Behaviours
 
             var hasFreeUnlocks = cachedBody.GetBuffCount(DLC2Content.Buffs.FreeUnlocks) > 0;
             int countTemp = ShrineOfRepair.Modules.ShrineOfRepairConfigManager.RepairTempItems.Value ? cachedBodyInventory.GetItemCountTemp(pickupDef.itemIndex) : 0;
+            countTemp += ShrineOfRepairConfigManager.RepairRentedItems.Value ? cachedBodyInventory.GetItemCountRented(pickupDef.itemIndex) : 0;
             bool isItem = ShrineOfRepairDictionary.RepairItemsDictionary.TryGetValue(pickupDef.itemIndex, out var itemIndex) || countTemp > 0;
             int count = cachedBodyInventory.GetItemCountPermanent(pickupDef.itemIndex);
             ItemTier tier = ItemCatalog.GetItemDef(itemIndex).tier;
